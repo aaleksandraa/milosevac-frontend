@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 APP_ROOT="${APP_ROOT:-/var/www/milosevac.com}"
-FRONTEND_DIR="${FRONTEND_DIR:-$APP_ROOT/httpdocs}"
+FRONTEND_DIR="${FRONTEND_DIR:-$APP_ROOT/frontend}"
 REF="${1:-main}"
 NPM_BIN="${NPM_BIN:-npm}"
 LOCK_FILE="$APP_ROOT/deploy-frontend.lock"

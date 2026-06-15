@@ -2,17 +2,16 @@
 
 Frontend je zaseban Git repozitorij `aaleksandraa/milosevac-frontend`.
 
-Na serveru se klonira u `/var/www/milosevac.com/httpdocs`, a Nginx servira
-njegov `dist/` direktorij. Laravel backend je zaseban repozitorij u
-`/var/www/milosevac.com/backend`.
+Laravel backend je instaliran direktno u root domena `/var/www/milosevac.com`.
+Frontend se klonira u `/var/www/milosevac.com/frontend`, a Nginx servira njegov
+`dist/` direktorij na `https://milosevac.com`.
 
 ## Prvi deployment
 
 ```bash
-sudo install -d -o milosevac -g www-data -m 2775 /var/www/milosevac.com
-sudo -u milosevac git clone git@github.com:aaleksandraa/milosevac-frontend.git /var/www/milosevac.com/httpdocs
+sudo -u milosevac git clone git@github.com:aaleksandraa/milosevac-frontend.git /var/www/milosevac.com/frontend
 sudo install -o milosevac -g www-data -m 0755 \
-  /var/www/milosevac.com/httpdocs/deploy/server/deploy-frontend.sh \
+  /var/www/milosevac.com/frontend/deploy/server/deploy-frontend.sh \
   /var/www/milosevac.com/deploy-frontend.sh
 sudo -u milosevac /var/www/milosevac.com/deploy-frontend.sh main
 ```

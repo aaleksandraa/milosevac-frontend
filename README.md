@@ -27,6 +27,7 @@ se aktuelni sadržaj učitava preko `/api`.
 
 ## Produkcija
 
-Repozitorij se klonira u `/var/www/milosevac.com/httpdocs`, a Nginx servira
-`/var/www/milosevac.com/httpdocs/dist`. Uputstvo i frontend deploy skripta su u
+Repozitorij se klonira u `/var/www/milosevac.com/frontend`, a Nginx servira
+`/var/www/milosevac.com/frontend/dist`. Laravel repo je direktno u rootu domena.
+Uputstvo i frontend deploy skripta su u
 [`deploy/README.md`](deploy/README.md).
