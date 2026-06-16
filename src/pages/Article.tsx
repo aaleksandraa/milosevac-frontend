@@ -8,6 +8,7 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { SectionTitle } from "@/components/news/SectionTitle";
 import { Button } from "@/components/ui/button";
 import { formatDateBs, getCategory, type Article as ArticleType } from "@/data/content";
+import { apiUrl } from "@/lib/backend";
 import { normalizeApiArticle, type ApiArticle, usePortalContent } from "@/hooks/usePortalContent";
 
 const articleAliases: Record<string, string> = {
@@ -111,7 +112,7 @@ const Article = () => {
     setFetchedArticle(undefined);
     setLookupFailed(false);
 
-    fetch(`/api/content/${encodeURIComponent(canonicalSlug)}`, {
+    fetch(apiUrl(`/content/${encodeURIComponent(canonicalSlug)}`), {
       headers: { Accept: "application/json" },
       signal: controller.signal,
     })

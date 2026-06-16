@@ -25,7 +25,7 @@ jobs:
           npm ci
           npm run lint
           npm test
-          VITE_BACKEND_PUBLIC_URL=https://milosevac.com npm run build
+          VITE_BACKEND_PUBLIC_URL=https://api.milosevac.com npm run build
 
   deploy:
     needs: test

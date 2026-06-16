@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { type Article } from "@/data/content";
+import { apiUrl, resolveMediaUrl, resolveSrcSet, rewriteContentHtml } from "@/lib/backend";
 import portalSnapshot from "@/data/portal-content.snapshot.json";
 
 export type ApiArticle = Omit<Article, "cover"> & {
@@ -13,7 +14,7 @@ type PortalContentOptions = {
   category?: string;
 };
 
-const storagePrefix = "portal-content-v1:";
+const storagePrefix = "portal-content-v2:";
 
 function readCachedContent(key: string): Article[] | undefined {
   try {
@@ -43,6 +44,9 @@ export function normalizeApiArticle(article: ApiArticle, index = 0): Article {
     ...article,
     body: article.body ?? [],
     cover: article.cover ?? coverFor(article.slug, index),
+    image: resolveMediaUrl(article.image),
+    imageSrcSet: resolveSrcSet(article.imageSrcSet),
+    contentHtml: rewriteContentHtml(article.contentHtml),
   };
 }
 
@@ -50,7 +54,7 @@ async function fetchPortalContent(limit: number, category?: string): Promise<Art
   const params = new URLSearchParams({ limit: String(limit) });
   if (category) params.set("category", category);
 
-  const response = await fetch(`/api/content?${params}`, {
+  const response = await fetch(apiUrl(`/content?${params}`), {
     headers: { Accept: "application/json" },
   });
   if (!response.ok) throw new Error("Portal content API nije dostupan");

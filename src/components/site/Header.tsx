@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { CloudSun, Menu, Search, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
-import { backendLoginUrl } from "@/lib/backend";
+import { backendLoginUrl, apiUrl } from "@/lib/backend";
 
 const navItems = [
   { label: "Naslovna", href: "/" },
@@ -31,7 +31,7 @@ export function Header({ onSearchClick }: { onSearchClick: () => void }) {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/weather", { headers: { Accept: "application/json" }, signal: controller.signal })
+    fetch(apiUrl("/weather"), { headers: { Accept: "application/json" }, signal: controller.signal })
       .then((response) => response.ok ? response.json() : null)
       .then((payload) => setTemperature(payload?.current?.temperature ?? null))
       .catch(() => {});
@@ -125,7 +125,7 @@ export function Header({ onSearchClick }: { onSearchClick: () => void }) {
                 </Link>
               ))}
             </nav>
-            <a href={backendLoginUrl} className="mt-2 block px-3 py-3 text-sm font-semibold text-muted-foreground">
+            <a href={backendLoginUrl()} className="mt-2 block px-3 py-3 text-sm font-semibold text-muted-foreground">
               Prijava za urednike
             </a>
           </div>

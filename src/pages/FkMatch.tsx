@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdSlot } from "@/components/site/AdSlot";
+import { apiUrl } from "@/lib/backend";
 import { fkPosavinaGalleryMatches, type FkPosavinaGalleryMatch } from "@/data/content";
 
 const INITIAL_GALLERY_LIMIT = 60;
@@ -34,7 +35,7 @@ const FkMatch = () => {
       return;
     }
 
-    fetch(`/api/fk-posavina/matches/${slug}`)
+    fetch(apiUrl(`/fk-posavina/matches/${slug}`))
       .then((response) => {
         if (!response.ok) {
           throw new Error("Utakmica nije dostupna u API-ju");

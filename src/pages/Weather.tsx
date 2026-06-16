@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { apiUrl } from "@/lib/backend";
 import {
   Cloud,
   CloudLightning,
@@ -98,7 +98,7 @@ const Weather = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/weather", { headers: { Accept: "application/json" } });
+      const response = await fetch(apiUrl("/weather"), { headers: { Accept: "application/json" } });
       if (!response.ok) throw new Error("Vremenska prognoza trenutno nije dostupna.");
       setForecast(await response.json());
     } catch {

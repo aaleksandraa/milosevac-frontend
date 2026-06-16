@@ -2,32 +2,35 @@
 
 React/Vite javni portal za `https://milosevac.com`.
 
-Laravel CMS i API održavaju se u zasebnom repozitoriju
-`aaleksandraa/milosevac-backend`. U lokalnom razvoju backend može biti kloniran
-u ignorisani `backend/` direktorij, pa Vite može posluživati uploadovane slike.
+Laravel CMS i API: `https://api.milosevac.com`  
+Repozitorij: `aaleksandraa/milosevac-backend`
 
 ## Lokalni razvoj
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
-npm run lint
-npm test
-npm run build
 ```
 
-Varijable iz `.env.example`:
+Backend kloniraj u ignorisani `backend/` folder i pokreni:
 
-- `VITE_BACKEND_URL` je lokalni API koji Vite prosljeđuje kroz `/api`.
-- `VITE_BACKEND_PUBLIC_URL` se koristi za backend/admin linkove.
-- `VITE_BACKEND_STORAGE_PATH` je lokalna putanja do Laravel public storagea.
+```bash
+cd backend && php artisan serve --port=8002
+```
 
-Frontend sadrži fallback snapshot u `src/data/portal-content.snapshot.json`, ali
-se aktuelni sadržaj učitava preko `/api`.
+Varijable (`.env.example`):
+
+- `VITE_BACKEND_URL` — lokalni Laravel (Vite proxy za `/api` u dev modu)
+- `VITE_BACKEND_PUBLIC_URL` — produkcijski API host (`https://api.milosevac.com`)
+- `VITE_BACKEND_STORAGE_PATH` — lokalna putanja do Laravel storagea (dev slike)
+
+U dev modu frontend zove `/api/...` kroz Vite proxy; u produkciji direktno
+`https://api.milosevac.com/api/...`.
 
 ## Produkcija
 
-Repozitorij se klonira u `/var/www/milosevac.com/frontend`, a Nginx servira
-`/var/www/milosevac.com/frontend/dist`. Laravel repo je direktno u rootu domena.
-Uputstvo i frontend deploy skripta su u
-[`deploy/README.md`](deploy/README.md).
+- **milosevac.com** — samo React `dist/`
+- **api.milosevac.com** — Laravel `public/`
+
+Uputstvo: [`deploy/README.md`](deploy/README.md)

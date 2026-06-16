@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdSlot } from "@/components/site/AdSlot";
 import { NewsCard } from "@/components/news/NewsCard";
+import { apiUrl } from "@/lib/backend";
 import { fkPosavinaGalleryMatches, type FkPosavinaGalleryMatch } from "@/data/content";
 import { usePortalContent } from "@/hooks/usePortalContent";
 
@@ -30,7 +31,7 @@ const FkPosavina = () => {
       setTimeout(() => target?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     }
 
-    fetch("/api/fk-posavina")
+    fetch(apiUrl("/fk-posavina"))
       .then((response) => {
         if (!response.ok) {
           throw new Error("FK Posavina API nije dostupan");
