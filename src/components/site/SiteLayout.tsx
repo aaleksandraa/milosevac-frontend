@@ -18,9 +18,9 @@ export function SiteLayout({ children, showBreaking = true }: SiteLayoutProps) {
     <div className="min-h-screen flex flex-col bg-background">
       {showBreaking && <BreakingTicker />}
       <Header onSearchClick={() => setSearchOpen(true)} />
-      <AdSlot variant="banner" lazy className="container-news mt-4" />
+      <AdSlot variant="banner" position="top_banner" lazy className="container-news mt-4" />
       <main className="flex-1">{children}</main>
-      <AdSlot variant="banner" lazy className="container-news mt-14" />
+      <AdSlot variant="banner" position="footer_banner" lazy className="container-news mt-14" />
       <Footer />
       {searchOpen && <Suspense fallback={null}><SearchOverlay open onOpenChange={setSearchOpen} /></Suspense>}
       <Suspense fallback={null}><CookieConsent /></Suspense>

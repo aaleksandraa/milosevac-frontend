@@ -128,11 +128,11 @@ const FkPosavina = () => {
               <p className="club-source">Izvor takmičarskih podataka: SportDC.</p>
             </section>
 
-            <AdSlot variant="inline" lazy />
+            <AdSlot variant="inline" position="club_after_results" lazy />
           </div>
 
           <aside className="club-sidebar">
-            <AdSlot variant="sidebar" lazy />
+            <AdSlot variant="sidebar" position="sidebar_primary" lazy />
           </aside>
         </div>
 
@@ -146,7 +146,7 @@ const FkPosavina = () => {
             <Link to="/kategorija/sport">Sve sportske vijesti</Link>
           </div>
 
-          <AdSlot variant="banner" lazy className="mb-5" />
+          <AdSlot variant="banner" position="match_gallery_top" lazy className="mb-5" />
 
           <div className="match-card-grid">
             {matches.map((match) => (

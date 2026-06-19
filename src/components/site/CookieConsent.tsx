@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { openCookieSettingsEvent } from "@/lib/cookie-consent";
-
-const consentKey = "milosevac_cookie_consent_v2";
+import { cookieConsentKey, cookieConsentUpdatedEvent, openCookieSettingsEvent } from "@/lib/cookie-consent";
 
 type Consent = {
   analytics: boolean;
@@ -12,7 +10,7 @@ type Consent = {
 
 function readConsent(): Consent | null {
   try {
-    return JSON.parse(localStorage.getItem(consentKey) || "null") as Consent | null;
+    return JSON.parse(localStorage.getItem(cookieConsentKey) || "null") as Consent | null;
   } catch {
     return null;
   }
@@ -30,7 +28,8 @@ export function CookieConsent() {
   }, []);
 
   const save = (value: Consent) => {
-    localStorage.setItem(consentKey, JSON.stringify(value));
+    localStorage.setItem(cookieConsentKey, JSON.stringify(value));
+    window.dispatchEvent(new Event(cookieConsentUpdatedEvent));
     setOpen(false);
   };
 

@@ -115,7 +115,7 @@ const Index = () => {
       </section>
 
       <section className="container-news mt-8">
-        <AdSlot variant="banner" lazy />
+        <AdSlot variant="banner" position="home_after_featured" lazy />
       </section>
 
       {notices.length > 0 && <section className="container-news mt-10">
@@ -156,7 +156,7 @@ const Index = () => {
             <NewsCard key={a.slug} article={a} />
           ))}
         </div>
-        <AdSlot variant="inline" lazy className="mt-6" />
+        <AdSlot variant="inline" position="home_mid_feed" lazy className="mt-6" />
       </section>
 
       <section className="mt-14 border-y border-border/70 bg-white/60 py-10">

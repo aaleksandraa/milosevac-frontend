@@ -218,7 +218,7 @@ const Article = () => {
 
         <div className="container-news">
           <div className="article-content">
-            <AdSlot variant="inline" lazy className="mb-8" />
+            <AdSlot variant="inline" position="article_top" lazy className="mb-8" />
             {article.contentHtml ? (
               <div
                 ref={articleProseRef}
@@ -231,7 +231,7 @@ const Article = () => {
                 {article.body.map(renderParagraph)}
               </div>
             )}
-            <AdSlot variant="inline" lazy className="mt-8" />
+            <AdSlot variant="inline" position="article_mid" lazy className="mt-8" />
 
             <div className="article-meta-panel">
               <span>

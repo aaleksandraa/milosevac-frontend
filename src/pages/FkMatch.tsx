@@ -173,7 +173,7 @@ const FkMatch = () => {
             )}
 
             <section className="section">
-              <AdSlot variant="inline" lazy className="mb-6" />
+              <AdSlot variant="inline" position="match_mid" lazy className="mb-6" />
               <div className="section-heading sport-heading">
                 <div>
                   <span />
