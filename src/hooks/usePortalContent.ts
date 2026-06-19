@@ -14,7 +14,7 @@ type PortalContentOptions = {
   category?: string;
 };
 
-const storagePrefix = "portal-content-v2:";
+const storagePrefix = "portal-content-v3:";
 
 function readCachedContent(key: string): Article[] | undefined {
   try {
