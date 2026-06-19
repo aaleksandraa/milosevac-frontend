@@ -24,7 +24,7 @@ const Index = () => {
   const sideFeatured = articles.slice(1, 4);
   const latest = articles.slice(3, 9);
   const sportArticles = articles.filter((a) => a.category === "sport");
-  const notices = articles.filter((article) => article.urgent).slice(0, 3);
+  const notices = articles.filter((article) => article.notice || article.urgent).slice(0, 3);
 
   if (loading) {
     return <SiteLayout><div className="container-news py-16 text-center text-muted-foreground">Učitavam članke...</div></SiteLayout>;
@@ -135,7 +135,7 @@ const Index = () => {
               key={article.slug}
               type="Obavještenje"
               title={article.title}
-              severity="high"
+              severity={article.urgent ? "high" : "medium"}
               href={`/clanak/${article.slug}`}
             />
           ))}

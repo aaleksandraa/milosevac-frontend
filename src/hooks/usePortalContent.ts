@@ -14,7 +14,7 @@ type PortalContentOptions = {
   category?: string;
 };
 
-const storagePrefix = "portal-content-v3:";
+const storagePrefix = "portal-content-v4:";
 
 function readCachedContent(key: string): Article[] | undefined {
   try {
@@ -56,6 +56,7 @@ async function fetchPortalContent(limit: number, category?: string): Promise<Art
 
   const response = await fetch(apiUrl(`/content?${params}`), {
     headers: { Accept: "application/json" },
+    cache: "no-store",
   });
   if (!response.ok) throw new Error("Portal content API nije dostupan");
 
@@ -75,12 +76,15 @@ export function usePortalContent(options: boolean | PortalContentOptions = {}) {
   const query = useQuery({
     queryKey: ["portal-content", limit, category ?? ""],
     queryFn: () => fetchPortalContent(limit, category),
-    initialData: () => readCachedContent(cacheKey) ?? bundledArticles,
+    initialData: () => import.meta.env.DEV ? (readCachedContent(cacheKey) ?? bundledArticles) : undefined,
     initialDataUpdatedAt: 0,
     enabled,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 5 * 60 * 1000,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: "always",
+    refetchOnReconnect: "always",
+    refetchInterval: import.meta.env.DEV ? false : 30 * 1000,
   });
 
   useEffect(() => {

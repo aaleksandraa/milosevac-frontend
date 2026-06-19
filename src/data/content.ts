@@ -30,6 +30,8 @@ export type Article = {
   imageSrcSet?: string | null;
   imageAlt?: string | null;
   urgent?: boolean;
+  notice?: boolean;
+  label?: string | null;
   tags?: string[];
   views?: number;
   body: string[]; // paragraphs (markdown-lite)
