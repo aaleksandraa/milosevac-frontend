@@ -69,7 +69,7 @@ export function usePortalContent(options: boolean | PortalContentOptions = {}) {
   const limit = normalized.limit ?? 40;
   const category = normalized.category;
   const cacheKey = `${limit}:${category ?? ""}`;
-  const bundledArticles = !category
+  const bundledArticles = import.meta.env.DEV && !category
     ? ((portalSnapshot as { articles?: ApiArticle[] }).articles ?? []).slice(0, limit).map(normalizeApiArticle)
     : undefined;
   const query = useQuery({
