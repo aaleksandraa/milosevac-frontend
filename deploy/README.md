@@ -88,13 +88,15 @@ storage/app/public/wordpress/2026/06/
 
 Frontend je na drugom domenu — backend mora dozvoliti `https://milosevac.com`.
 
-U `milosevac-backend` dodaj `config/cors.php` (ako ne postoji) i u `.env`:
+`config/cors.php` je uključen u backend repozitorij. U produkcijskom `.env`
+postavi:
 
 ```env
 FRONTEND_URL=https://milosevac.com
 ```
 
-U `bootstrap/app.php` osiguraj da API middleware uključuje CORS (Laravel 12: `HandleCors` je default za `api/*`).
+Laravel 12 globalno uključuje CORS middleware. Poslije promjene `.env` ili
+configa pokreni `php artisan optimize:clear`.
 
 Test:
 
