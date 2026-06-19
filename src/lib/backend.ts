@@ -1,7 +1,14 @@
 const trimTrailingSlash = (url: string) => url.replace(/\/$/, "");
 
 export function getBackendPublicUrl(): string {
-  return trimTrailingSlash(import.meta.env.VITE_BACKEND_PUBLIC_URL || "http://127.0.0.1:8002");
+  const fallbackUrl = import.meta.env.DEV ? "http://127.0.0.1:8002" : "https://api.milosevac.com";
+  const configuredUrl = import.meta.env.VITE_BACKEND_PUBLIC_URL;
+
+  if (!import.meta.env.DEV && /^https?:\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?(?:\/|$)/i.test(configuredUrl || "")) {
+    return fallbackUrl;
+  }
+
+  return trimTrailingSlash(configuredUrl || fallbackUrl);
 }
 
 export function backendLoginUrl(): string {

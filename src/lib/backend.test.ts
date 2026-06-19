@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { apiUrl, resolveMediaUrl, resolveSrcSet, rewriteContentHtml } from "./backend";
+import { apiUrl, getBackendPublicUrl, resolveMediaUrl, resolveSrcSet, rewriteContentHtml } from "./backend";
 
 describe("backend urls", () => {
   afterEach(() => {
@@ -26,5 +26,21 @@ describe("backend urls", () => {
     expect(rewriteContentHtml('<img src="/storage/wordpress/a.webp">')).toBe(
       '<img src="https://api.milosevac.com/storage/wordpress/a.webp">',
     );
+  });
+
+  it("falls back to the api subdomain in production", () => {
+    vi.stubEnv("DEV", false);
+    vi.stubEnv("VITE_BACKEND_PUBLIC_URL", "");
+
+    expect(getBackendPublicUrl()).toBe("https://api.milosevac.com");
+    expect(apiUrl("/content?limit=1")).toBe("https://api.milosevac.com/api/content?limit=1");
+  });
+
+  it("ignores loopback public urls in production", () => {
+    vi.stubEnv("DEV", false);
+    vi.stubEnv("VITE_BACKEND_PUBLIC_URL", "http://127.0.0.1:8002");
+
+    expect(getBackendPublicUrl()).toBe("https://api.milosevac.com");
+    expect(apiUrl("/weather")).toBe("https://api.milosevac.com/api/weather");
   });
 });
