@@ -11,6 +11,8 @@ import { formatDateBs, getCategory, type Article as ArticleType } from "@/data/c
 import { apiUrl } from "@/lib/backend";
 import { normalizeApiArticle, type ApiArticle, usePortalContent } from "@/hooks/usePortalContent";
 
+const ARTICLE_GALLERY_BATCH_SIZE = 24;
+
 const articleAliases: Record<string, string> = {
   "prekid-isporuke-elektricne-energije": "obavjestenje-o-prekidu-isporuke-elektricne-energije-u-dijelu-milosevca",
   "fk-posavina-pobjeda": "fk-posavina-ubjedljiva-pobjeda-na-domacem-terenu",
@@ -69,6 +71,7 @@ const Article = () => {
   const [fetchedArticle, setFetchedArticle] = useState<ArticleType | null>();
   const [lookupFailed, setLookupFailed] = useState(false);
   const [lightbox, setLightbox] = useState<{ images: LightboxImage[]; index: number } | null>(null);
+  const [visibleGalleryCount, setVisibleGalleryCount] = useState(ARTICLE_GALLERY_BATCH_SIZE);
   const articleProseRef = useRef<HTMLDivElement>(null);
   const { articles } = usePortalContent(Boolean(fetchedArticle));
   const article = fetchedArticle ?? articles.find((item) => item.slug === canonicalSlug);
@@ -133,6 +136,7 @@ const Article = () => {
   useEffect(() => {
     window.scrollTo({ top: 0 });
     closeLightbox();
+    setVisibleGalleryCount(ARTICLE_GALLERY_BATCH_SIZE);
     if (article) {
       document.title = `${article.title} - Miloševac`;
     }
@@ -173,6 +177,9 @@ const Article = () => {
   const cat = getCategory(article.category);
   const related = articles.filter((a) => a.slug !== article.slug && a.category === article.category).slice(0, 3);
   const latest = articles.filter((a) => a.slug !== article.slug).slice(0, 3);
+  const articleGallery = article.gallery ?? [];
+  const visibleGallery = articleGallery.slice(0, visibleGalleryCount);
+  const hasMoreGallery = visibleGalleryCount < articleGallery.length;
 
   const ld = {
     "@context": "https://schema.org",
@@ -232,6 +239,55 @@ const Article = () => {
               </div>
             )}
             <AdSlot variant="inline" position="article_mid" lazy className="mt-8" />
+
+            {articleGallery.length > 0 ? (
+              <section className="section article-gallery-section">
+                <div className="section-heading sport-heading">
+                  <div>
+                    <span />
+                    <h2>Galerija clanka</h2>
+                    <p>{article.galleryCount ?? articleGallery.length} fotografija</p>
+                  </div>
+                </div>
+
+                <div className="match-gallery">
+                  {visibleGallery.map((photo, index) => (
+                    <figure key={photo.id}>
+                      <button
+                        className="match-gallery-trigger"
+                        type="button"
+                        onClick={() => {
+                          setLightbox({
+                            images: articleGallery.map((item) => ({
+                              src: item.fullSrc || item.src,
+                              alt: item.caption || item.alt || article.title,
+                            })),
+                            index,
+                          });
+                        }}
+                        aria-label="Otvori sliku preko cijelog ekrana"
+                      >
+                        <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
+                        <span className="photo-watermark">Milosevac</span>
+                      </button>
+                      {photo.caption ? <figcaption>{photo.caption}</figcaption> : null}
+                    </figure>
+                  ))}
+                </div>
+
+                {hasMoreGallery ? (
+                  <div className="gallery-load-more">
+                    <button
+                      className="btn secondary"
+                      type="button"
+                      onClick={() => setVisibleGalleryCount((current) => Math.min(current + ARTICLE_GALLERY_BATCH_SIZE, articleGallery.length))}
+                    >
+                      Prikazi jos fotografija
+                    </button>
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
 
             <div className="article-meta-panel">
               <span>

@@ -40,6 +40,12 @@ function coverFor(slug: string, index: number): Article["cover"] {
 }
 
 export function normalizeApiArticle(article: ApiArticle, index = 0): Article {
+  const gallery = (article.gallery ?? []).map((photo) => ({
+    ...photo,
+    src: resolveMediaUrl(photo.src) ?? photo.src,
+    fullSrc: resolveMediaUrl(photo.fullSrc) ?? photo.fullSrc,
+  }));
+
   return {
     ...article,
     body: article.body ?? [],
@@ -47,6 +53,8 @@ export function normalizeApiArticle(article: ApiArticle, index = 0): Article {
     image: resolveMediaUrl(article.image),
     imageSrcSet: resolveSrcSet(article.imageSrcSet),
     contentHtml: rewriteContentHtml(article.contentHtml),
+    gallery,
+    galleryCount: article.galleryCount ?? gallery.length,
   };
 }
 

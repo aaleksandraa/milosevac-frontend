@@ -17,6 +17,14 @@ export const categories: Category[] = [
   { slug: "kontakt", name: "Kontakt", color: "cat-vijesti", description: "Pišite nam." },
 ];
 
+export type ArticleGalleryPhoto = {
+  id: string;
+  src: string;
+  fullSrc?: string;
+  alt: string;
+  caption?: string | null;
+};
+
 export type Article = {
   slug: string;
   title: string;
@@ -36,6 +44,8 @@ export type Article = {
   views?: number;
   body: string[]; // paragraphs (markdown-lite)
   contentHtml?: string;
+  gallery?: ArticleGalleryPhoto[];
+  galleryCount?: number;
 };
 
 // Demo tagovi po članku — u produkciji dolaze iz WordPress-a
