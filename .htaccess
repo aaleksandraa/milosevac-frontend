@@ -2,6 +2,10 @@
     RewriteEngine On
     RewriteBase /
 
+    RewriteRule ^robots\.txt$ - [L]
+    RewriteRule ^ads\.txt$ - [L]
+    RewriteRule ^sitemap\.xml$ - [L]
+
     # SEO XML endpoints are generated dynamically by the API application.
     RewriteRule ^sitemap-pages\.xml$ https://api.milosevac.com/sitemap-pages.xml [R=302,L]
     RewriteRule ^sitemap-posts\.xml$ https://api.milosevac.com/sitemap-posts.xml [R=302,L]
