@@ -11,7 +11,7 @@ const NotFound = () => {
 
   return (
     <SiteLayout>
-      <main className="container-news flex flex-col items-center justify-center py-20 text-center sm:py-28">
+      <section className="container-news flex flex-col items-center justify-center py-20 text-center sm:py-28">
         <p className="text-6xl font-extrabold tracking-tight text-primary sm:text-7xl">404</p>
         <h1 className="mt-4 text-2xl font-extrabold sm:text-3xl">Stranica nije pronađena</h1>
         <p className="mt-3 max-w-md text-muted-foreground">
@@ -30,7 +30,7 @@ const NotFound = () => {
             </Link>
           </Button>
         </div>
-      </main>
+      </section>
     </SiteLayout>
   );
 };

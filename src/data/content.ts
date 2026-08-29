@@ -1,5 +1,6 @@
-// Centralizovani demo podaci za portal Miloševac.
-// U produkciji se zamjenjuju WordPress REST API pozivima.
+﻿// Tipovi sadržaja, taksonomija kategorija i pomoćne funkcije za formatiranje.
+// Nizovi `articles` i `fkPosavinaGalleryMatches` služe samo kao rezervni prikaz
+// dok se ne učitaju podaci sa `/api` — u produkciji ih zamjenjuje CMS.
 
 export type Category = {
   slug: string;
@@ -25,6 +26,13 @@ export type ArticleGalleryPhoto = {
   caption?: string | null;
 };
 
+export type ArticlePlace = {
+  slug: string;
+  name: string;
+  locative?: string | null;
+  isPrimary?: boolean;
+};
+
 export type Article = {
   slug: string;
   title: string;
@@ -40,6 +48,15 @@ export type Article = {
   urgent?: boolean;
   notice?: boolean;
   label?: string | null;
+  serviceType?: string | null;
+  noticeStartsAt?: string | null;
+  noticeEndsAt?: string | null;
+  outageStatus?: "upcoming" | "active" | "past" | null;
+  locationsRaw?: string | null;
+  transformerArea?: string | null;
+  fieldUnit?: string | null;
+  sourceUrl?: string | null;
+  places?: ArticlePlace[];
   tags?: string[];
   views?: number;
   body: string[]; // paragraphs (markdown-lite)
@@ -204,60 +221,6 @@ export const articles: Article[] = [
   },
 ];
 
-export type FkPosavinaMatch = {
-  id: string;
-  status: "played" | "upcoming";
-  competition: string;
-  date: string;
-  venue: string;
-  home: string;
-  away: string;
-  homeScore?: number;
-  awayScore?: number;
-  note: string;
-};
-
-export const fkPosavinaMatches: FkPosavinaMatch[] = [
-  {
-    id: "m1",
-    status: "played",
-    competition: "Liga Posavine",
-    date: "2026-04-25T17:00:00",
-    venue: "Stadion Miloševac",
-    home: "FK Posavina",
-    away: "Sloga",
-    homeScore: 3,
-    awayScore: 0,
-    note: "Sigurna pobjeda pred domaćom publikom.",
-  },
-  {
-    id: "m2",
-    status: "upcoming",
-    competition: "Liga Posavine",
-    date: "2026-05-30T16:00:00Z",
-    venue: "Gostovanje",
-    home: "Mladost",
-    away: "FK Posavina",
-    note: "Naredno kolo, polazak navijača biće naknadno objavljen.",
-  },
-  {
-    id: "m3",
-    status: "upcoming",
-    competition: "Kup opštine",
-    date: "2026-06-06T18:00:00Z",
-    venue: "Stadion Miloševac",
-    home: "FK Posavina",
-    away: "Borac",
-    note: "Kup utakmica na domaćem terenu.",
-  },
-];
-
-export const fkPosavinaGallery = [
-  { title: "FK Posavina - sezona u slikama", date: "2026-04-25", hue: 145, pattern: "grid" as const, count: 52 },
-  { title: "Navijači na domaćoj utakmici", date: "2026-04-25", hue: 30, pattern: "diagonal" as const, count: 28 },
-  { title: "Trening pionira i omladinaca", date: "2026-04-19", hue: 200, pattern: "dots" as const, count: 34 },
-  { title: "Stadion Miloševac iz arhive", date: "2026-04-12", hue: 265, pattern: "blocks" as const, count: 18 },
-];
 
 export type FkPosavinaGalleryPhoto = {
   id: string;
@@ -374,40 +337,6 @@ export const fkPosavinaGalleryMatches: FkPosavinaGalleryMatch[] = [
   },
 ];
 
-export const alerts = [
-  {
-    id: "a1",
-    type: "Hitno",
-    title: "Prekid isporuke električne energije — srijeda 09:00–14:00",
-    location: "Posavskih brigada, Vidovdanska",
-    severity: "high" as const,
-    href: "/clanak/obavjestenje-o-prekidu-isporuke-elektricne-energije-u-dijelu-milosevca",
-  },
-  {
-    id: "a2",
-    type: "Najava",
-    title: "Akcija prikupljanja pomoći za porodicu Marković",
-    location: "Dom kulture, subota 10:00",
-    severity: "info" as const,
-    href: "#",
-  },
-  {
-    id: "a3",
-    type: "Komunalno",
-    title: "Privremena izmjena režima odvoza smeća tokom praznika",
-    location: "Cijelo područje MZ Miloševac",
-    severity: "medium" as const,
-    href: "#",
-  },
-];
-
-export const breakingItems: { text: string; slug: string }[] = [
-  { text: "⚡ Prekid struje u srijedu 09:00–14:00 u dijelu Miloševca", slug: "obavjestenje-o-prekidu-isporuke-elektricne-energije-u-dijelu-milosevca" },
-  { text: "🚒 Vatrogasci lokalizovali sinoćnji požar — nema povrijeđenih", slug: "vatrogasci-brzo-reagovali-na-pozar-u-milosevcu" },
-  { text: "⚽ FK Posavina slavila 3:0 pred domaćom publikom", slug: "fk-posavina-ubjedljiva-pobjeda-na-domacem-terenu" },
-  { text: "🎭 KUD Miloševac najavljuje godišnji koncert", slug: "kud-milosevac-priprema-godisnji-koncert" },
-  { text: "💊 Objavljena nova lista lijekova Fonda RS", slug: "objavljena-nova-lista-lijekova-fonda-zdravstvenog-osiguranja-rs" },
-];
 
 export function formatDateBs(iso: string) {
   const d = new Date(iso);
@@ -442,15 +371,6 @@ export function getCategory(slug: string) {
   return categories.find((c) => c.slug === slug);
 }
 
-export function getArticle(slug: string) {
-  return articles.find((a) => a.slug === slug);
-}
-
-export function getArticlesByCategory(slug: string) {
-  return articles.filter((a) => a.category === slug);
-}
-
-// Apply tag/views demo data
 articles.forEach((a) => {
   const m = tagMap[a.slug];
   if (m) {
@@ -458,16 +378,3 @@ articles.forEach((a) => {
     a.views = m.views;
   }
 });
-
-// All unique tags across articles
-export function getAllTags(): string[] {
-  const set = new Set<string>();
-  articles.forEach((a) => a.tags?.forEach((t) => set.add(t)));
-  return Array.from(set).sort();
-}
-
-export function getTagsForCategory(catSlug: string): string[] {
-  const set = new Set<string>();
-  articles.filter((a) => a.category === catSlug).forEach((a) => a.tags?.forEach((t) => set.add(t)));
-  return Array.from(set).sort();
-}

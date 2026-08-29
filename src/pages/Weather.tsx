@@ -1,5 +1,4 @@
-import { apiUrl } from "@/lib/backend";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Cloud,
   CloudLightning,
@@ -18,50 +17,7 @@ import {
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-
-type WeatherIconName = "sun" | "partly" | "cloud" | "rain" | "storm" | "snow";
-
-type WeatherPayload = {
-  configured: boolean;
-  source: string;
-  location: string;
-  updated_at?: string;
-  message?: string;
-  current: null | {
-    temperature: number | null;
-    feels_like: number | null;
-    humidity: number | null;
-    precipitation: number | null;
-    pressure: number | null;
-    uv_index: number | null;
-    wind_speed: number | null;
-    wind_direction: string | null;
-    weather_text: string;
-    icon: WeatherIconName;
-  };
-  hourly: Array<{
-    datetime: string | null;
-    time: string | null;
-    temperature: number | null;
-    real_feel: number | null;
-    rain_probability: number | null;
-    wind_speed: number | null;
-    weather_text: string;
-    icon: WeatherIconName;
-  }>;
-  daily: Array<{
-    date: string | null;
-    label: string | null;
-    min: number | null;
-    max: number | null;
-    day_text: string;
-    rain_probability: number | null;
-    wind_speed: number | null;
-    sunrise: string | null;
-    sunset: string | null;
-    icon: WeatherIconName;
-  }>;
-};
+import { useWeather, type WeatherIconName } from "@/hooks/useWeather";
 
 function WeatherIcon({ name, className = "h-6 w-6" }: { name: WeatherIconName; className?: string }) {
   const icons = {
@@ -91,28 +47,11 @@ function formatUpdated(iso?: string) {
 }
 
 const Weather = () => {
-  const [forecast, setForecast] = useState<WeatherPayload | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadWeather = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(apiUrl("/weather"), { headers: { Accept: "application/json" } });
-      if (!response.ok) throw new Error("Vremenska prognoza trenutno nije dostupna.");
-      setForecast(await response.json());
-    } catch {
-      setError("Nije moguće učitati prognozu. Pokušajte ponovo malo kasnije.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { forecast, loading, error, refetch } = useWeather();
 
   useEffect(() => {
-    document.title = "Vrijeme - Miloševac";
+    document.title = "Vrijeme u Miloševcu - prognoza za 7 dana";
     window.scrollTo({ top: 0 });
-    loadWeather();
   }, []);
 
   const updated = useMemo(() => formatUpdated(forecast?.updated_at), [forecast?.updated_at]);
@@ -152,7 +91,7 @@ const Weather = () => {
           <div className="editorial-panel p-6 sm:p-8">
             <h2 className="text-xl font-extrabold">Prognoza nije dostupna</h2>
             <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-            <Button onClick={loadWeather} className="mt-5">
+            <Button onClick={() => refetch()} className="mt-5">
               Pokušaj ponovo
             </Button>
           </div>

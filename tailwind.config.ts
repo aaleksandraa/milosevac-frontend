@@ -40,6 +40,18 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        highlight: {
+          DEFAULT: "hsl(var(--highlight))",
+          foreground: "hsl(var(--highlight-foreground))",
+        },
+        ink: {
+          DEFAULT: "hsl(var(--ink))",
+          body: "hsl(var(--ink-body))",
+        },
+        surface: {
+          reading: "hsl(var(--surface-reading))",
+          dark: "hsl(var(--surface-dark))",
+        },
         urgent: {
           DEFAULT: "hsl(var(--urgent))",
           foreground: "hsl(var(--urgent-foreground))",

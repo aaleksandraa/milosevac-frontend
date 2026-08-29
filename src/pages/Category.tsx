@@ -167,7 +167,7 @@ const Category = () => {
 
       <section className="container-news mt-5 grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
-          <div className="soft-panel sticky top-[116px] z-20 overflow-hidden">
+          <div className="soft-panel sticky top-[var(--sticky-offset)] z-20 overflow-hidden">
             <details className="filter-details group [&[open]>summary>svg.chev]:rotate-180">
               <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 select-none hover:bg-secondary/70 lg:hidden [&::-webkit-details-marker]:hidden">
                 <span className="inline-flex items-center gap-2 text-sm font-semibold">
@@ -306,10 +306,7 @@ const Category = () => {
             <>
               <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-1">
                 {visible.map((a) => (
-                  <NewsCard key={a.slug} article={a} variant="wide" className="hidden xl:grid" />
-                ))}
-                {visible.map((a) => (
-                  <NewsCard key={`m-${a.slug}`} article={a} className="xl:hidden" />
+                  <NewsCard key={a.slug} article={a} variant="adaptive" />
                 ))}
               </div>
               {shown < list.length && (
@@ -323,7 +320,7 @@ const Category = () => {
           )}
         </div>
 
-        <aside className="space-y-5 lg:sticky lg:top-[116px] lg:self-start">
+        <aside className="space-y-5 lg:sticky lg:top-[var(--sticky-offset)] lg:self-start">
           <div className="editorial-panel p-5">
             <div className="mb-4 flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">

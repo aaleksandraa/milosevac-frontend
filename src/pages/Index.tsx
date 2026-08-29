@@ -10,6 +10,8 @@ import { SectionTitle } from "@/components/news/SectionTitle";
 import { Button } from "@/components/ui/button";
 import { getCategory, formatDateBs } from "@/data/content";
 import { usePortalContent } from "@/hooks/usePortalContent";
+import { useFkPosavina } from "@/hooks/useFkPosavina";
+import { outageLocationLabel, sortOutageArticles } from "@/hooks/useOutages";
 
 const quickLinks = [
   ["Vijesti", "/kategorija/vijesti", "Brza lokalna obavještenja"],
@@ -18,13 +20,22 @@ const quickLinks = [
   ["Kontakt", "/kontakt", "Pošaljite vijest redakciji"],
 ];
 
+function formatMatchDay(iso?: string) {
+  if (!iso) return "";
+  const date = new Date(iso);
+  return `${String(date.getDate()).padStart(2, "0")}.${String(date.getMonth() + 1).padStart(2, "0")}.`;
+}
+
 const Index = () => {
   const { articles, loading, error } = usePortalContent();
+  const { latestMatch: lastMatch } = useFkPosavina();
   const featured = articles[0];
   const sideFeatured = articles.slice(1, 4);
   const latest = articles.slice(3, 9);
   const sportArticles = articles.filter((a) => a.category === "sport");
-  const notices = articles.filter((article) => article.notice || article.urgent).slice(0, 3);
+  const notices = sortOutageArticles(
+    articles.filter((article) => article.notice || article.urgent || article.serviceType === "power_outage"),
+  ).slice(0, 3);
 
   if (loading) {
     return <SiteLayout><div className="container-news py-16 text-center text-muted-foreground">Učitavam članke...</div></SiteLayout>;
@@ -124,7 +135,7 @@ const Index = () => {
           subtitle="Praktične informacije za stanovnike Miloševca"
           accent="urgent"
           action={
-            <Link to="/kategorija/vijesti" className="action-link">
+            <Link to="/prekidi-struje" className="action-link">
               Sve <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           }
@@ -133,8 +144,9 @@ const Index = () => {
           {notices.map((article) => (
             <AlertCard
               key={article.slug}
-              type="Obavještenje"
+              type={article.serviceType === "power_outage" ? "Prekid struje" : "Obavještenje"}
               title={article.title}
+              location={outageLocationLabel(article) || undefined}
               severity={article.urgent ? "high" : "medium"}
               href={`/clanak/${article.slug}`}
             />
@@ -171,27 +183,32 @@ const Index = () => {
             }
           />
           <div className="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-            <div className="editorial-panel p-6">
-              <span className="category-pill bg-cat-sport text-white">
+            <div className="editorial-panel flex flex-col p-5 sm:p-6">
+              <span className="category-pill w-max bg-cat-sport text-white">
                 <Trophy className="h-3 w-3" /> Posljednja utakmica
               </span>
-              <div className="mt-5 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between gap-2">
                 <div className="flex-1 text-center">
-                  <div className="text-sm font-bold">FK Posavina</div>
-                  <div className="mt-1 text-4xl font-extrabold">3</div>
+                  <div className="text-sm font-bold">{lastMatch.home}</div>
+                  <div className="mt-1 text-4xl font-extrabold">{lastMatch.homeScore ?? "-"}</div>
                 </div>
-                <div className="rounded-md bg-secondary px-3 py-1 text-xs font-bold text-muted-foreground">25.04.</div>
+                <div className="rounded-md bg-secondary px-2.5 py-1 text-xs font-bold text-muted-foreground">
+                  {formatMatchDay(lastMatch.date)}
+                </div>
                 <div className="flex-1 text-center">
-                  <div className="text-sm font-bold">Sloga</div>
-                  <div className="mt-1 text-4xl font-extrabold text-muted-foreground">0</div>
+                  <div className="text-sm font-bold">{lastMatch.away}</div>
+                  <div className="mt-1 text-4xl font-extrabold text-muted-foreground">{lastMatch.awayScore ?? "-"}</div>
                 </div>
               </div>
-              <p className="mt-4 text-center text-xs text-muted-foreground">Stadion Miloševac · Domaća utakmica</p>
-              <div className="mt-5 border-t pt-4">
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Naredna utakmica</p>
-                <p className="text-sm font-bold">Mladost - FK Posavina</p>
-                <p className="text-xs text-muted-foreground">subota, 16:00</p>
-              </div>
+              {lastMatch.venue && (
+                <p className="mt-4 text-center text-xs text-muted-foreground">{lastMatch.venue}</p>
+              )}
+              <Link
+                to={`/fk-posavina/utakmica/${lastMatch.slug}`}
+                className="action-link mt-5 justify-center border-t pt-4"
+              >
+                Otvori izvještaj <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {sportArticles.length > 0 && <NewsCard article={sportArticles[0]} className="sm:col-span-2" />}

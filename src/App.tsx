@@ -10,6 +10,7 @@ const Contact = lazy(() => import("./pages/Contact.tsx"));
 const FkPosavina = lazy(() => import("./pages/FkPosavina.tsx"));
 const FkMatch = lazy(() => import("./pages/FkMatch.tsx"));
 const Weather = lazy(() => import("./pages/Weather.tsx"));
+const PowerOutages = lazy(() => import("./pages/PowerOutages.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const PrivacyPolicy = lazy(() => import("./pages/Legal.tsx").then((module) => ({ default: module.PrivacyPolicy })));
 const CookiePolicy = lazy(() => import("./pages/Legal.tsx").then((module) => ({ default: module.CookiePolicy })));
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/fk-posavina" element={<FkPosavina />} />
           <Route path="/fk-posavina/utakmica/:slug" element={<FkMatch />} />
           <Route path="/vrijeme" element={<Weather />} />
+          <Route path="/prekidi-struje" element={<PowerOutages />} />
           <Route path="/kontakt" element={<Contact />} />
           <Route path="/politika-privatnosti" element={<PrivacyPolicy />} />
           <Route path="/politika-kolacica" element={<CookiePolicy />} />

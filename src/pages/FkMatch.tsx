@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdSlot } from "@/components/site/AdSlot";
@@ -68,6 +68,28 @@ const FkMatch = () => {
     return () => document.body.classList.remove("has-image-lightbox");
   }, [lightboxIndex]);
 
+  const photoCount = match.photos.length;
+
+  const showPreviousLightboxImage = useCallback(() => {
+    setLightboxIndex((current) => {
+      if (current === null || photoCount === 0) {
+        return current;
+      }
+
+      return (current - 1 + photoCount) % photoCount;
+    });
+  }, [photoCount]);
+
+  const showNextLightboxImage = useCallback(() => {
+    setLightboxIndex((current) => {
+      if (current === null || photoCount === 0) {
+        return current;
+      }
+
+      return (current + 1) % photoCount;
+    });
+  }, [photoCount]);
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -85,31 +107,11 @@ const FkMatch = () => {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [match.photos.length]);
+  }, [showNextLightboxImage, showPreviousLightboxImage]);
 
   const visiblePhotos = match.photos.slice(0, visibleCount);
   const hasMorePhotos = visibleCount < match.photos.length;
   const activePhoto = lightboxIndex !== null ? match.photos[lightboxIndex] : null;
-
-  const showPreviousLightboxImage = () => {
-    setLightboxIndex((current) => {
-      if (current === null || match.photos.length === 0) {
-        return current;
-      }
-
-      return (current - 1 + match.photos.length) % match.photos.length;
-    });
-  };
-
-  const showNextLightboxImage = () => {
-    setLightboxIndex((current) => {
-      if (current === null || match.photos.length === 0) {
-        return current;
-      }
-
-      return (current + 1) % match.photos.length;
-    });
-  };
 
   const handleLightboxTouchEnd = (clientX: number) => {
     if (touchStartX.current === null) {
@@ -225,6 +227,7 @@ const FkMatch = () => {
           onTouchEnd={(event) => handleLightboxTouchEnd(event.changedTouches[0]?.clientX ?? 0)}
           role="dialog"
           aria-modal="true"
+          aria-label={`Galerija fotografija: ${match.title}`}
         >
           <button className="image-lightbox-close" type="button" onClick={() => setLightboxIndex(null)} aria-label="Zatvori prikaz">
             ×

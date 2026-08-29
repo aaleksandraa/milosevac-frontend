@@ -1,8 +1,21 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
+
+function renderHeader() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <Header onSearchClick={() => {}} />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
 
 describe("mobile header and footer", () => {
   afterEach(() => {
@@ -16,18 +29,26 @@ describe("mobile header and footer", () => {
       json: () => Promise.resolve({ current: { temperature: 19.2 } }),
     }));
 
-    render(
-      <MemoryRouter>
-        <Header onSearchClick={() => {}} />
-      </MemoryRouter>,
-    );
+    renderHeader();
 
-    await waitFor(() => expect(screen.getByLabelText("Trenutna temperatura i vrijeme u Miloševcu")).toHaveTextContent("19°"));
+    await waitFor(() =>
+      expect(
+        screen.getByLabelText("Trenutna temperatura i vremenska prognoza za Miloševac"),
+      ).toHaveTextContent("19°"),
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Otvori meni" }));
 
     expect(screen.getAllByText("Vrijeme").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Obavještenja").length).toBeGreaterThan(0);
+  });
+
+  it("keeps the brand mark visible on small screens", () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) }));
+
+    renderHeader();
+
+    expect(screen.getByRole("link", { name: "Miloševac - naslovna strana" })).toBeInTheDocument();
   });
 
   it("uses centered portal links and real social profiles without removed categories", () => {

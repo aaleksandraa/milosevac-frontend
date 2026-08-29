@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdSlot } from "@/components/site/AdSlot";
 import { NewsCard } from "@/components/news/NewsCard";
-import { apiUrl } from "@/lib/backend";
-import { fkPosavinaGalleryMatches, type FkPosavinaGalleryMatch } from "@/data/content";
 import { usePortalContent } from "@/hooks/usePortalContent";
+import { useFkPosavina } from "@/hooks/useFkPosavina";
 
 function formatDate(iso?: string) {
   if (!iso) {
@@ -19,35 +18,16 @@ function formatDate(iso?: string) {
 const FkPosavina = () => {
   const { articles } = usePortalContent({ category: "sport", limit: 60 });
   const sportArticles = articles.filter((a) => a.category === "sport" || a.tags?.includes("fk-posavina"));
-  const [matches, setMatches] = useState<FkPosavinaGalleryMatch[]>(fkPosavinaGalleryMatches);
-  const featuredMatch = matches[0] || fkPosavinaGalleryMatches[0];
+  const { matches, latestMatch: featuredMatch } = useFkPosavina();
 
   useEffect(() => {
-    document.title = "FK Posavina - Miloševac";
+    document.title = "FK Posavina - rezultati, tabela i galerije | Miloševac";
     window.scrollTo({ top: 0 });
 
     if (window.location.hash) {
       const target = document.querySelector(window.location.hash);
       setTimeout(() => target?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     }
-
-    fetch(apiUrl("/fk-posavina"))
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("FK Posavina API nije dostupan");
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        const liveMatches = data.galleryMatches?.length ? data.galleryMatches : data.matches;
-        if (liveMatches?.length) {
-          setMatches(liveMatches);
-        }
-      })
-      .catch(() => {
-        setMatches(fkPosavinaGalleryMatches);
-      });
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { type MouseEvent, useCallback, useEffect, useRef, useState } from "react";
-import { Calendar, ChevronLeft, ChevronRight, Clock, Facebook, Link2, Share2, User, X } from "lucide-react";
+import { Calendar, Check, ChevronLeft, ChevronRight, Clock, Facebook, Link2, Share2, User, X } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdSlot } from "@/components/site/AdSlot";
 import { CoverArt } from "@/components/news/CoverArt";
@@ -72,6 +72,7 @@ const Article = () => {
   const [lookupFailed, setLookupFailed] = useState(false);
   const [lightbox, setLightbox] = useState<{ images: LightboxImage[]; index: number } | null>(null);
   const [visibleGalleryCount, setVisibleGalleryCount] = useState(ARTICLE_GALLERY_BATCH_SIZE);
+  const [linkCopied, setLinkCopied] = useState(false);
   const articleProseRef = useRef<HTMLDivElement>(null);
   const { articles } = usePortalContent(Boolean(fetchedArticle));
   const article = fetchedArticle ?? articles.find((item) => item.slug === canonicalSlug);
@@ -137,10 +138,26 @@ const Article = () => {
     window.scrollTo({ top: 0 });
     closeLightbox();
     setVisibleGalleryCount(ARTICLE_GALLERY_BATCH_SIZE);
+    setLinkCopied(false);
     if (article) {
       document.title = `${article.title} - Miloševac`;
     }
   }, [canonicalSlug, article, closeLightbox]);
+
+  const shareOnFacebook = useCallback(() => {
+    const target = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+    window.open(target, "_blank", "noopener,noreferrer,width=640,height=560");
+  }, []);
+
+  const copyArticleLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2500);
+    } catch {
+      window.prompt("Kopirajte link članka:", window.location.href);
+    }
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("has-image-lightbox", lightbox !== null);
@@ -320,13 +337,13 @@ const Article = () => {
                 Podijeli članak
               </span>
               <div>
-                <Button variant="outline" size="sm" className="gap-1.5">
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={shareOnFacebook}>
                   <Facebook className="h-4 w-4" />
                   Facebook
                 </Button>
-                <Button variant="outline" size="sm" className="gap-1.5">
-                  <Link2 className="h-4 w-4" />
-                  Kopiraj link
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={copyArticleLink}>
+                  {linkCopied ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />}
+                  {linkCopied ? "Link kopiran" : "Kopiraj link"}
                 </Button>
               </div>
             </div>

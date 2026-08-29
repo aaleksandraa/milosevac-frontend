@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 
 interface NewsCardProps {
   article: Article;
-  variant?: "default" | "horizontal" | "compact" | "wide";
+  /** `adaptive` stacks like `default` on small screens and becomes `wide` at xl. */
+  variant?: "default" | "horizontal" | "compact" | "wide" | "adaptive";
   className?: string;
 }
 
@@ -99,17 +100,26 @@ export function NewsCard({ article, variant = "default", className }: NewsCardPr
     );
   }
 
+  const isAdaptive = variant === "adaptive";
+
   return (
     <Link
       to={`/clanak/${article.slug}`}
-      className={cn("news-card group flex flex-col h-full", className)}
+      className={cn(
+        "news-card group flex h-full flex-col overflow-hidden",
+        isAdaptive && "xl:grid xl:grid-cols-[38%_1fr]",
+        className,
+      )}
       aria-label={article.title}
     >
       <div className="relative overflow-hidden">
         <CoverArt
           hue={article.cover.hue}
           pattern={article.cover.pattern}
-          className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.04]"
+          className={cn(
+            "aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.04]",
+            isAdaptive && "xl:aspect-auto xl:h-full xl:min-h-[210px]",
+          )}
           label={article.title}
           src={article.image}
           srcSet={article.imageSrcSet}
@@ -121,11 +131,18 @@ export function NewsCard({ article, variant = "default", className }: NewsCardPr
           )}
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="text-base font-bold leading-snug line-clamp-3 group-hover:text-primary transition-colors text-balance sm:text-lg">
+      <div className={cn("flex flex-1 flex-col gap-2 p-4", isAdaptive && "xl:p-5")}>
+        <h3
+          className={cn(
+            "text-base font-bold leading-snug line-clamp-3 group-hover:text-primary transition-colors text-balance sm:text-lg",
+            isAdaptive && "xl:text-xl",
+          )}
+        >
           {article.title}
         </h3>
-        <p className="text-sm text-muted-foreground line-clamp-2">{article.excerpt}</p>
+        <p className={cn("text-sm text-muted-foreground line-clamp-2", isAdaptive && "xl:line-clamp-3")}>
+          {article.excerpt}
+        </p>
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/70 pt-3 text-xs text-muted-foreground">
           <span className="line-clamp-1">{formatDateBs(article.date)}</span>
           <span className="flex shrink-0 items-center gap-3">
