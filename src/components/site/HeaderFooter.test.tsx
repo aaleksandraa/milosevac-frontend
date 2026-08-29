@@ -33,9 +33,14 @@ describe("mobile header and footer", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByLabelText("Trenutna temperatura i vremenska prognoza za Miloševac"),
+        screen.getAllByLabelText("Trenutna temperatura i vremenska prognoza za Miloševac")[0],
       ).toHaveTextContent("19°"),
     );
+
+    expect(screen.getByLabelText("Naslovna strana")).toBeInTheDocument();
+    expect(screen.getByLabelText("FK Posavina")).toBeInTheDocument();
+    expect(screen.getByLabelText("Prekidi struje")).toBeInTheDocument();
+    expect(screen.getAllByLabelText("Pretraži vijesti").length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Otvori meni" }));
 
