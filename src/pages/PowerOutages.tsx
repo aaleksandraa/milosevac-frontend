@@ -65,19 +65,19 @@ const PowerOutages = () => {
   return (
     <SiteLayout>
       <section className="container-news pt-6 sm:pt-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-border/70 pb-5">
-          <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-md bg-accent/10 px-3 py-1 text-sm font-extrabold text-accent">
-              <Zap className="h-4 w-4" /> Planirani prekidi
-            </div>
-            <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">Prekidi struje</h1>
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-              Obavijesti Elektro Doboja za Modričku regiju. Miloševac je istaknut, a prekide možete filtrirati po mjestu i statusu.
-            </p>
+        <div className="mb-6 border-b border-border/70 pb-5">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-md bg-accent/10 px-3 py-1 text-sm font-extrabold text-accent">
+            <Zap className="h-4 w-4" /> Planirani prekidi
           </div>
-          <Button type="button" variant="outline" onClick={() => refetch()}>
-            Osvježi
-          </Button>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-3xl font-extrabold leading-tight sm:text-4xl">Prekidi struje</h1>
+            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => refetch()}>
+              Osvježi
+            </Button>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
+            Obavijesti Elektro Doboja za Modričku regiju.
+          </p>
         </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
