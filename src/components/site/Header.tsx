@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { CloudSun, Home, Menu, Search, Volleyball, X, Zap } from "lucide-react";
+import { CloudSun, Home, Menu, Search, X, Zap } from "lucide-react";
+import { FootballIcon } from "@/components/icons/FootballIcon";
 import { cn } from "@/lib/utils";
 import { useWeather } from "@/hooks/useWeather";
 
@@ -81,7 +82,7 @@ export function Header({ onSearchClick }: { onSearchClick: () => void }) {
             )}
             aria-label="FK Posavina"
           >
-            <Volleyball className="h-5 w-5" />
+            <FootballIcon />
           </Link>
 
           <Link
