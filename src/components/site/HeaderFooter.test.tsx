@@ -23,7 +23,7 @@ describe("mobile header and footer", () => {
     vi.unstubAllGlobals();
   });
 
-  it("shows current temperature and includes weather in the mobile menu", async () => {
+  it("shows current temperature and opens the mobile menu", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ current: { temperature: 19.2 } }),
@@ -39,16 +39,17 @@ describe("mobile header and footer", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Otvori meni" }));
 
-    expect(screen.getAllByText("Vrijeme").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Vrijeme")).not.toBeInTheDocument();
+    expect(screen.queryByText("Sport")).not.toBeInTheDocument();
     expect(screen.getAllByText("Obavještenja").length).toBeGreaterThan(0);
   });
 
-  it("keeps the brand mark visible on small screens", () => {
+  it("does not show the Miloševac wordmark in the header", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) }));
 
     renderHeader();
 
-    expect(screen.getByRole("link", { name: "Miloševac - naslovna strana" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Miloševac - naslovna strana" })).not.toBeInTheDocument();
   });
 
   it("uses centered portal links and real social profiles without removed categories", () => {

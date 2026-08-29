@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { CloudSun, Menu, Search, X } from "lucide-react";
-import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 import { useWeather } from "@/hooks/useWeather";
 
@@ -10,9 +9,7 @@ const navItems = [
   { label: "Vijesti", href: "/kategorija/vijesti" },
   { label: "Obavještenja", href: "/kategorija/vijesti?tag=obavjestenje" },
   { label: "Prekidi struje", href: "/prekidi-struje" },
-  { label: "Sport", href: "/kategorija/sport" },
   { label: "FK Posavina", href: "/fk-posavina" },
-  { label: "Vrijeme", href: "/vrijeme" },
   { label: "Kontakt", href: "/kontakt" },
 ];
 
@@ -32,10 +29,8 @@ export function Header({ onSearchClick }: { onSearchClick: () => void }) {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-white/95 backdrop-blur-xl">
-      <div className="container-news flex h-16 items-center justify-between gap-2 sm:h-20 sm:gap-4">
-        <Logo />
-
-        <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Glavna navigacija">
+      <div className="container-news flex h-16 items-center justify-between gap-3 sm:h-20 sm:gap-4">
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-8" aria-label="Glavna navigacija">
           {navItems.map((item) => (
             <Link
               key={item.href}
