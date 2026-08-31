@@ -21,4 +21,10 @@ git -C "$FRONTEND_DIR" checkout --force --detach FETCH_HEAD
   VITE_BACKEND_PUBLIC_URL="${VITE_BACKEND_PUBLIC_URL:-https://api.milosevac.com}" "$NPM_BIN" run build
 )
 
+test -f "$FRONTEND_DIR/dist/.htaccess" || { echo "Missing dist/.htaccess after build"; exit 1; }
+grep -q 'api.milosevac.com%{REQUEST_URI}' "$FRONTEND_DIR/dist/.htaccess" || {
+  echo "dist/.htaccess is missing the social crawler redirect rule";
+  exit 1;
+}
+
 echo "Frontend deployment completed: $(git -C "$FRONTEND_DIR" rev-parse --short HEAD)"
