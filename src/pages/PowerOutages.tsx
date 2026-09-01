@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   formatOutageWindow,
   outageLocationLabel,
+  sortOutageArticles,
   type OutageStatus,
   useOutages,
 } from "@/hooks/useOutages";
@@ -54,6 +55,8 @@ const PowerOutages = () => {
     () => [{ slug: "", name: "Sva mjesta", isPrimary: false }, ...places],
     [places],
   );
+
+  const sortedOutages = useMemo(() => sortOutageArticles(outages), [outages]);
 
   const updateFilter = (nextPlace?: string, nextStatus?: OutageStatus | "all") => {
     const params = new URLSearchParams();
@@ -125,14 +128,14 @@ const PowerOutages = () => {
           </div>
         )}
 
-        {!loading && !error && outages.length === 0 && (
+        {!loading && !error && sortedOutages.length === 0 && (
           <div className="rounded-lg border border-border/70 bg-card p-8 text-center text-muted-foreground">
             Nema prekida za odabrane filtere.
           </div>
         )}
 
         <div className="grid gap-4">
-          {outages.map((outage) => {
+          {sortedOutages.map((outage) => {
             const location = outageLocationLabel(outage);
             const window = formatOutageWindow(outage.noticeStartsAt, outage.noticeEndsAt);
             const isMilosevac = outage.places?.some((item) => item.isPrimary);

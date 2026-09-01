@@ -73,25 +73,38 @@ export function outageLocationLabel(article: Article): string {
   return "";
 }
 
-export function outageSortPriority(article: Article): number {
-  const isMilosevac = article.places?.some((place) => place.isPrimary) ?? false;
-  const status = article.outageStatus;
-
-  if (isMilosevac && status === "active") return 4;
-  if (isMilosevac && status === "upcoming") return 3;
-  if (status === "active") return 2;
+function outageStatusRank(status?: OutageStatus | null): number {
+  if (status === "active") return 0;
   if (status === "upcoming") return 1;
+  if (status === "past") return 2;
+  return 1;
+}
+
+function outageStartTimestamp(article: Article): number {
+  if (article.noticeStartsAt) return +new Date(article.noticeStartsAt);
+  if (article.date) return +new Date(article.date);
   return 0;
 }
 
 export function sortOutageArticles(articles: Article[]): Article[] {
   return [...articles].sort((a, b) => {
-    const priorityDiff = outageSortPriority(b) - outageSortPriority(a);
-    if (priorityDiff !== 0) return priorityDiff;
+    const statusDiff = outageStatusRank(a.outageStatus) - outageStatusRank(b.outageStatus);
+    if (statusDiff !== 0) return statusDiff;
 
-    const aStart = a.noticeStartsAt ? +new Date(a.noticeStartsAt) : 0;
-    const bStart = b.noticeStartsAt ? +new Date(b.noticeStartsAt) : 0;
-    return aStart - bStart;
+    const aStart = outageStartTimestamp(a);
+    const bStart = outageStartTimestamp(b);
+
+    if (a.outageStatus === "past") {
+      return bStart - aStart;
+    }
+
+    if (aStart !== bStart) {
+      return aStart - bStart;
+    }
+
+    const aMilosevac = a.places?.some((place) => place.isPrimary) ? 1 : 0;
+    const bMilosevac = b.places?.some((place) => place.isPrimary) ? 1 : 0;
+    return bMilosevac - aMilosevac;
   });
 }
 
