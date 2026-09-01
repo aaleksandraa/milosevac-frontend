@@ -5,13 +5,17 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasMunicipalities } from "@/hooks/useAtlas";
+import { useAtlasPoiData } from "@/hooks/useAtlasPoiData";
 import { atlasMatches } from "@/lib/atlas-search";
 import { formatBsNumber, formatCensusPopulation } from "@/lib/atlas-format";
+import { poiDisplayLabel } from "@/lib/atlas-poi-types";
 
 const AtlasIndex = () => {
   const { municipalities, loading, error } = useAtlasMunicipalities();
+  const { collection: poiCollection } = useAtlasPoiData();
   const [query, setQuery] = useState("");
   const [selectedSettlementId, setSelectedSettlementId] = useState<number | null>(null);
+  const [selectedPoiId, setSelectedPoiId] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = "Atlas naseljenih mjesta | Miloševac.com";
@@ -30,6 +34,18 @@ const AtlasIndex = () => {
     }).filter((row) => row.show);
   }, [municipalities, query]);
 
+  const poiMatches = useMemo(() => {
+    if (query.trim() === "") return [];
+    return (poiCollection?.features ?? []).filter((feature) => {
+      const props = feature.properties;
+      return (
+        atlasMatches(poiDisplayLabel(props), query) ||
+        (props.name ? atlasMatches(props.name, query) : false) ||
+        (props.type_label ? atlasMatches(props.type_label, query) : false)
+      );
+    });
+  }, [poiCollection, query]);
+
   useEffect(() => {
     const matches = municipalities.flatMap((municipality) =>
       (municipality.settlements ?? []).filter((settlement) => atlasMatches(settlement.name, query)),
@@ -37,7 +53,10 @@ const AtlasIndex = () => {
     if (query.trim() !== "" && matches.length === 1) {
       setSelectedSettlementId(matches[0].id);
     }
-  }, [municipalities, query]);
+    if (query.trim() !== "" && poiMatches.length === 1 && matches.length !== 1) {
+      setSelectedPoiId(poiMatches[0].properties.id);
+    }
+  }, [municipalities, poiMatches, query]);
 
   if (loading) {
     return <SiteLayout><div className="container-news py-16 text-center text-muted-foreground">Učitavam atlas mjesta...</div></SiteLayout>;
@@ -70,12 +89,14 @@ const AtlasIndex = () => {
           <AtlasMap
             selectedSettlementId={selectedSettlementId}
             onSelectedSettlementIdChange={setSelectedSettlementId}
+            selectedPoiId={selectedPoiId}
+            onSelectedPoiIdChange={setSelectedPoiId}
           />
         </div>
 
         <div className="mb-6">
           <label htmlFor="atlas-pretraga" className="mb-1.5 block text-sm font-bold">
-            Pretraga naselja i opština
+            Pretraga naselja, opština i objekata
           </label>
           <div className="relative max-w-xl">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -125,7 +146,33 @@ const AtlasIndex = () => {
           ))}
         </div>
 
-        {filtered.length === 0 ? (
+        {query.trim() !== "" && poiMatches.length > 0 ? (
+          <section className="editorial-panel mt-4 p-5 sm:p-6" aria-labelledby="atlas-poi-rezultati">
+            <h2 id="atlas-poi-rezultati" className="text-base font-extrabold">Objekti</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Rezultati iz uvezenog OSM kataloga, odvojeno od naselja.</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {poiMatches.slice(0, 8).map((feature) => (
+                <li key={feature.properties.id}>
+                  <button
+                    type="button"
+                    className="text-left hover:text-primary"
+                    onClick={() => setSelectedPoiId(feature.properties.id)}
+                  >
+                    <span className="font-bold">{poiDisplayLabel(feature.properties)}</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      · Objekat
+                      {feature.properties.type_label ? ` · ${feature.properties.type_label}` : ""}
+                      {feature.properties.settlement_name ? ` · ${feature.properties.settlement_name}` : ""}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {filtered.length === 0 && poiMatches.length === 0 ? (
           <p className="editorial-panel mt-4 py-10 text-center text-muted-foreground">Nema rezultata za unesenu pretragu.</p>
         ) : null}
 

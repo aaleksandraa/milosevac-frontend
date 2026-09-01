@@ -12,7 +12,10 @@ Branch (backend): `feature/bih-settlement-atlas`
 | **M3** | **Complete** | Public `/api/geo` + `/mjesta` pages, SEO/sitemap |
 | **M4** | **Complete** | Settlement boundaries + DEM terrain stats (37/45 pilot) |
 | **M5** | **Complete** | Interactive MapLibre atlas map (GeoJSON, OpenFreeMap) |
-| M6–M12 | Not started | OSM POIs, climate, rankings, compare, national import |
+| **M6** | **Complete** | Settlement POI catalog + OSM import (761 unique pilot objects) |
+| M7–M12 | Not started | Climate, rankings, compare, national import |
+
+## M3 result
 
 ## M3 result
 
@@ -36,4 +39,11 @@ Branch (backend): `feature/bih-settlement-atlas`
 - OpenFreeMap Positron basemap; OSM + Copernicus attribution visible
 - See [M5_INTERACTIVE_MAP.md](M5_INTERACTIVE_MAP.md)
 
-M6 was not started.
+## M6 result
+
+- Generic `geo_places` / `geo_place_types` catalog (not the outage `places` table)
+- Overpass fetch → private cache → classified import for Modriča + Šamac
+- 761 unique OSM POIs; map GeoJSON ~345 KB (no vector tiles)
+- See [M6_POI_CATALOG.md](M6_POI_CATALOG.md)
+
+M7 was not started.

@@ -11,10 +11,20 @@ export const ATLAS_MAP_LAYERS = {
   selected: "atlas-settlements-selected",
 } as const;
 
+export const ATLAS_POI_SOURCE_ID = "atlas-places";
+
+export const ATLAS_POI_LAYERS = {
+  circles: "atlas-places-circles",
+  selected: "atlas-places-selected",
+} as const;
+
 export const DEFAULT_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
 
 export const OSM_BOUNDARY_ATTRIBUTION =
   'Granice naselja © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)';
+
+export const OSM_POI_ATTRIBUTION =
+  'Objekti © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)';
 
 export const COPERNICUS_ATTRIBUTION = "Visine: Copernicus DEM GLO-30";
 

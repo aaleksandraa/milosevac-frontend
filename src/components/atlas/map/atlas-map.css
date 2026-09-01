@@ -59,8 +59,16 @@
   width: min(22rem, calc(100% - 1rem));
 }
 
+.atlas-poi-filters {
+  max-width: min(22rem, calc(100vw - 5.5rem));
+}
+
 @media (max-width: 639px) {
   .atlas-map-popup {
     width: calc(100% - 1rem);
+  }
+
+  .atlas-poi-filters {
+    max-width: min(18rem, calc(100vw - 4.5rem));
   }
 }

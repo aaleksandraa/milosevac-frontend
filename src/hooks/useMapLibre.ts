@@ -34,6 +34,7 @@ export function useMapLibre(enabled: boolean) {
             compact: false,
             customAttribution: [
               'Granice naselja © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
+              'Objekti © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
               "Visine: Copernicus DEM GLO-30",
             ],
           },

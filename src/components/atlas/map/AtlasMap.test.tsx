@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
-import { fetchAtlasMapSettlements } from "@/lib/atlas-api";
+import { fetchAtlasMapPlaces, fetchAtlasMapSettlements } from "@/lib/atlas-api";
 import { findMapFeature } from "@/lib/atlas-map-style";
 import type { AtlasMapCollection } from "@/lib/atlas-map-types";
 
@@ -70,6 +70,66 @@ vi.mock("@/hooks/useAtlasMapData", () => ({
   },
 }));
 
+const poiState = vi.hoisted(() => ({
+  collection: {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        id: 501,
+        properties: {
+          id: 501,
+          type: "pharmacy",
+          family: "health",
+          family_label: "Zdravstvo",
+          type_label: "Apoteka",
+          name: "Apoteka Centar",
+          display_label: "Apoteka Centar",
+          municipality_name: "Modriča",
+          municipality_slug: "modrica",
+          settlement_name: "Miloševac",
+          settlement_slug: "milosevac",
+          address: "Ulica 1",
+          website: "https://example.test",
+          phone: "+387 53 000",
+        },
+        geometry: { type: "Point", coordinates: [18.4, 44.99] },
+      },
+      {
+        type: "Feature",
+        id: 502,
+        properties: {
+          id: 502,
+          type: "football_pitch",
+          family: "sport",
+          family_label: "Sport i rekreacija",
+          type_label: "Fudbalski teren",
+          name: null,
+          display_label: "Fudbalski teren",
+          name_is_generic: true,
+          municipality_name: "Modriča",
+          municipality_slug: "modrica",
+          settlement_name: "Miloševac",
+        },
+        geometry: { type: "Point", coordinates: [18.41, 44.99] },
+      },
+    ],
+    meta: {
+      coverage_note: "Prikazani objekti su trenutno mapirani i uvezeni zapisi iz OpenStreetMap (ODbL).",
+    },
+  } as import("@/lib/atlas-poi-types").AtlasPoiCollection,
+  error: false,
+}));
+
+vi.mock("@/hooks/useAtlasPoiData", () => ({
+  useAtlasPoiData: () => ({
+    collection: poiState.collection,
+    loading: false,
+    error: poiState.error,
+    refetch: vi.fn(),
+  }),
+}));
+
 vi.mock("@/hooks/useMapLibre", () => ({
   useMapLibre: () => ({
     containerRef: { current: null },
@@ -85,6 +145,7 @@ describe("atlas map", () => {
     mapState.loading = false;
     mapState.error = false;
     mapState.webglFailed = false;
+    poiState.error = false;
   });
 
   it("renders map container, legend and methodology", () => {
@@ -196,6 +257,49 @@ describe("atlas map", () => {
     expect(findMapFeature(twins, 99)?.properties.municipality_slug).toBe("samac");
     expect(findMapFeature(twins, 10)?.properties.municipality_slug).toBe("modrica");
   });
+
+  it("renders POI family filters and selected POI card", () => {
+    render(
+      <MemoryRouter>
+        <AtlasMap selectedPoiId={501} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Objekti")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Zdravstvo" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Apoteka Centar" })).toBeInTheDocument();
+    expect(screen.getByText("Apoteka")).toBeInTheDocument();
+    expect(screen.getByText("Ulica 1")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Veb stranica" })).toHaveAttribute("href", "https://example.test");
+    expect(screen.getByText(/uvezeni zapisi iz OpenStreetMap/)).toBeInTheDocument();
+  });
+
+  it("uses a generic type label for unnamed POIs and hides missing optional fields", () => {
+    render(
+      <MemoryRouter>
+        <AtlasMap selectedPoiId={502} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("dialog", { name: "Fudbalski teren" })).toBeInTheDocument();
+    expect(screen.getByText(/bez vlastitog imena/)).toBeInTheDocument();
+    expect(screen.queryByText("Veb stranica")).not.toBeInTheDocument();
+    expect(screen.queryByText("Telefon")).not.toBeInTheDocument();
+    expect(screen.queryByText("Adresa")).not.toBeInTheDocument();
+  });
+
+  it("keeps the boundary map when the POI API fails", () => {
+    poiState.error = true;
+    render(
+      <MemoryRouter>
+        <AtlasMap selectedSettlementId={10} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/Sloj objekata trenutno nije učitan/)).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Karta naseljenih mjesta" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Miloševac" })).toBeInTheDocument();
+  });
 });
 
 describe("atlas map API client", () => {
@@ -209,6 +313,21 @@ describe("atlas map API client", () => {
     await fetchAtlasMapSettlements("modrica");
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/geo/map/settlements?municipality=modrica",
+      expect.objectContaining({ headers: { Accept: "application/json" } }),
+    );
+    vi.unstubAllGlobals();
+  });
+
+  it("requests the POI GeoJSON endpoint with municipality scope", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ type: "FeatureCollection", features: [] }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await fetchAtlasMapPlaces({ municipalitySlug: "modrica", family: "health" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/geo/map/places?municipality=modrica&family=health",
       expect.objectContaining({ headers: { Accept: "application/json" } }),
     );
     vi.unstubAllGlobals();

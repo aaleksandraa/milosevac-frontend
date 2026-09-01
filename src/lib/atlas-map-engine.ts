@@ -2,12 +2,17 @@ import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 import {
   ATLAS_MAP_LAYERS,
   ATLAS_MAP_SOURCE_ID,
+  ATLAS_POI_LAYERS,
+  ATLAS_POI_SOURCE_ID,
   OSM_BOUNDARY_ATTRIBUTION,
+  OSM_POI_ATTRIBUTION,
   sourceSpecFromCollection,
   thematicFillExpression,
   type AtlasMapSourceSpec,
 } from "@/lib/atlas-map-style";
 import type { AtlasMapCollection, AtlasThematicMode } from "@/lib/atlas-map-types";
+import type { AtlasPoiCollection } from "@/lib/atlas-poi-types";
+import { POI_FAMILY_COLORS } from "@/lib/atlas-poi-types";
 
 export function addOrReplaceAtlasSource(map: MapLibreMap, spec: AtlasMapSourceSpec): void {
   if (map.getSource(ATLAS_MAP_SOURCE_ID)) {
@@ -136,4 +141,83 @@ export function setAtlasFeatureStates(
     clear(previousSelectedId, "selected");
     set(selectedId, "selected");
   }
+}
+
+const EMPTY_POI_COLLECTION: AtlasPoiCollection = { type: "FeatureCollection", features: [] };
+
+function familyColorExpression(): unknown[] {
+  const match: unknown[] = ["match", ["get", "family"]];
+  Object.entries(POI_FAMILY_COLORS).forEach(([family, color]) => {
+    match.push(family, color);
+  });
+  match.push("#57534e");
+  return match;
+}
+
+export function syncAtlasPoiGeoJson(map: MapLibreMap, collection: AtlasPoiCollection | undefined): void {
+  const data = collection ?? EMPTY_POI_COLLECTION;
+  if (map.getSource(ATLAS_POI_SOURCE_ID)) {
+    const source = map.getSource(ATLAS_POI_SOURCE_ID) as GeoJSONSource;
+    source.setData(data as GeoJSON.FeatureCollection);
+    return;
+  }
+
+  map.addSource(ATLAS_POI_SOURCE_ID, {
+    type: "geojson",
+    data: data as GeoJSON.FeatureCollection,
+    promoteId: "id",
+    attribution: OSM_POI_ATTRIBUTION,
+  });
+
+  map.addLayer({
+    id: ATLAS_POI_LAYERS.circles,
+    type: "circle",
+    source: ATLAS_POI_SOURCE_ID,
+    paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 3.2, 12, 5.5, 15, 8],
+      "circle-color": familyColorExpression() as never,
+      "circle-stroke-width": 1.15,
+      "circle-stroke-color": "#f8fafc",
+      "circle-opacity": 0.92,
+    },
+  });
+  map.addLayer({
+    id: ATLAS_POI_LAYERS.selected,
+    type: "circle",
+    source: ATLAS_POI_SOURCE_ID,
+    paint: {
+      "circle-radius": ["interpolate", ["linear"], ["zoom"], 8, 5, 12, 8, 15, 11],
+      "circle-color": familyColorExpression() as never,
+      "circle-stroke-width": ["case", ["boolean", ["feature-state", "selected"], false], 2.6, 0],
+      "circle-stroke-color": "#111827",
+      "circle-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0],
+    },
+  });
+}
+
+export function filterAtlasPoiLayer(map: MapLibreMap, families: string[]): void {
+  if (!map.getLayer(ATLAS_POI_LAYERS.circles)) return;
+  const filter = families.length === 0 ? null : (["in", ["get", "family"], ["literal", families]] as never);
+  map.setFilter(ATLAS_POI_LAYERS.circles, filter);
+  if (map.getLayer(ATLAS_POI_LAYERS.selected)) {
+    map.setFilter(ATLAS_POI_LAYERS.selected, filter);
+  }
+}
+
+export function setAtlasPoiSelectedState(
+  map: MapLibreMap,
+  selectedId: number | null,
+  previousSelectedId: number | null,
+): void {
+  if (previousSelectedId != null) {
+    map.setFeatureState({ source: ATLAS_POI_SOURCE_ID, id: previousSelectedId }, { selected: false });
+  }
+  if (selectedId != null) {
+    map.setFeatureState({ source: ATLAS_POI_SOURCE_ID, id: selectedId }, { selected: true });
+  }
+}
+
+export function findPoiFeature(collection: AtlasPoiCollection | undefined, id: number | null | undefined) {
+  if (!collection || id == null) return undefined;
+  return collection.features.find((feature) => feature.id === id || feature.properties.id === id);
 }

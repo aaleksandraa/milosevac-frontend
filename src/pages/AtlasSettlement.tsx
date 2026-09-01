@@ -7,7 +7,10 @@ import { PopulationTable } from "@/components/atlas/PopulationTable";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasSettlement } from "@/hooks/useAtlas";
+import { useAtlasSettlementPlaces } from "@/hooks/useAtlasPoiData";
 import type { GeoGeography } from "@/lib/atlas-types";
+import type { AtlasPoiGroup } from "@/lib/atlas-poi-types";
+import { poiDisplayLabel } from "@/lib/atlas-poi-types";
 import { formatAreaKm2, formatBsNumber, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
 
 const AtlasSettlement = () => {
@@ -134,6 +137,10 @@ const AtlasSettlement = () => {
         ) : null}
 
         <GeographySection geography={settlement.geography} />
+
+        {municipality ? (
+          <SettlementPlacesSection municipalitySlug={municipality.slug} settlementSlug={settlement.slug} />
+        ) : null}
 
         <div className="mt-8">
           <SourcePanel source={settlement.source} />
@@ -267,5 +274,51 @@ function GeographySection({ geography }: { geography?: GeoGeography }) {
         </div>
       ) : null}
     </section>
+  );
+}
+
+function SettlementPlacesSection({
+  municipalitySlug,
+  settlementSlug,
+}: {
+  municipalitySlug: string;
+  settlementSlug: string;
+}) {
+  const { groups, count, coverageNote, loading } = useAtlasSettlementPlaces(municipalitySlug, settlementSlug);
+  const visibleGroups = groups.filter((group) => group.places.length > 0);
+  if (loading || visibleGroups.length === 0) return null;
+
+  return (
+    <section className="mt-8" aria-labelledby="objekti-sadrzaji">
+      <h2 id="objekti-sadrzaji" className="text-lg font-extrabold">Objekti i sadržaji</h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        {coverageNote ??
+          `U trenutno dostupnim podacima evidentirano je ${count} ${count === 1 ? "objekat" : "objekata"}. To nije službeni niti iscrpan inventar.`}
+      </p>
+      <div className="mt-4 grid gap-4">
+        {visibleGroups.map((group) => (
+          <PoiFamilyGroup key={group.family} group={group} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PoiFamilyGroup({ group }: { group: AtlasPoiGroup }) {
+  return (
+    <div className="editorial-panel p-5 sm:p-6">
+      <h3 className="text-base font-extrabold">{group.family_label}</h3>
+      <ul className="mt-3 space-y-2 text-sm">
+        {group.places.map((place) => {
+          const details = [place.name_is_generic ? null : place.type_label, place.address, place.operator].filter(Boolean);
+          return (
+            <li key={place.id}>
+              <p className="font-bold">{poiDisplayLabel(place)}</p>
+              {details.length > 0 ? <p className="text-muted-foreground">{details.join(" · ")}</p> : null}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

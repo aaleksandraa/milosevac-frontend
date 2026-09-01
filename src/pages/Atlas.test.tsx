@@ -156,6 +156,17 @@ const hookState = {
   loading: false,
   error: false,
   notFound: false,
+  placeGroups: [] as Array<{ family: string; family_label: string; places: Array<{
+    id: number;
+    display_label: string;
+    name?: string | null;
+    name_is_generic?: boolean;
+    type_label?: string;
+    address?: string | null;
+    operator?: string | null;
+    website?: string | null;
+    phone?: string | null;
+  }> }>,
 };
 
 vi.mock("@/components/site/SiteLayout", () => ({
@@ -168,6 +179,24 @@ vi.mock("@/hooks/useAtlasMapData", () => ({
     loading: mapState.loading,
     error: mapState.error,
     refetch: vi.fn(),
+  }),
+}));
+
+vi.mock("@/hooks/useAtlasPoiData", () => ({
+  useAtlasPoiData: () => ({
+    collection: { type: "FeatureCollection", features: [] },
+    loading: false,
+    error: false,
+    refetch: vi.fn(),
+  }),
+  useAtlasSettlementPlaces: () => ({
+    groups: hookState.placeGroups ?? [],
+    count: (hookState.placeGroups ?? []).reduce((sum, group) => sum + group.places.length, 0),
+    coverageNote: hookState.placeGroups?.length
+      ? "U trenutno dostupnim podacima evidentirani su uvezeni OSM objekti."
+      : undefined,
+    loading: false,
+    error: false,
   }),
 }));
 
@@ -219,6 +248,7 @@ describe("atlas pages", () => {
     hookState.loading = false;
     hookState.error = false;
     hookState.notFound = false;
+    hookState.placeGroups = [];
     mapState.collection = mapCollection;
     mapState.loading = false;
     mapState.error = false;
@@ -253,7 +283,7 @@ describe("atlas pages", () => {
       </MemoryRouter>,
     );
 
-    fireEvent.change(screen.getByLabelText("Pretraga naselja i opština"), { target: { value: "Milosevac" } });
+    fireEvent.change(screen.getByLabelText("Pretraga naselja, opština i objekata"), { target: { value: "Milosevac" } });
 
     expect(screen.getAllByRole("link", { name: /Miloševac/ })[0]).toHaveAttribute("href", "/mjesta/modrica/milosevac");
     expect(screen.queryByRole("link", { name: "Šamac" })).not.toBeInTheDocument();
@@ -294,6 +324,7 @@ describe("atlas pages", () => {
     expect(screen.getByRole("link", { name: "Modriča →" })).toHaveAttribute("href", "/mjesta/modrica/modrica");
     expect(screen.queryByRole("heading", { name: "Geografija i teren" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Nadmorska visina$/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Objekti i sadržaji" })).not.toBeInTheDocument();
   });
 
   it("renders terrain section when geography data exists, including elevation 0", () => {
@@ -351,5 +382,39 @@ describe("atlas pages", () => {
       </MemoryRouter>,
     );
     expect(screen.getByText(/Atlas trenutno nije moguće učitati/)).toBeInTheDocument();
+  });
+
+  it("groups settlement POIs and hides empty families", () => {
+    hookState.placeGroups = [
+      {
+        family: "education",
+        family_label: "Obrazovanje",
+        places: [
+          { id: 1, display_label: "Osnovna škola Test", name: "Osnovna škola Test", type_label: "Osnovna škola" },
+        ],
+      },
+      {
+        family: "sport",
+        family_label: "Sport i rekreacija",
+        places: [
+          { id: 2, display_label: "Fudbalski teren", name: null, name_is_generic: true, type_label: "Fudbalski teren" },
+        ],
+      },
+      { family: "health", family_label: "Zdravstvo", places: [] },
+    ];
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Objekti i sadržaji" })).toBeInTheDocument();
+    expect(screen.getByText("Osnovna škola Test")).toBeInTheDocument();
+    expect(screen.getByText("Fudbalski teren")).toBeInTheDocument();
+    expect(screen.getByText(/U trenutno dostupnim podacima/)).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Zdravstvo" })).not.toBeInTheDocument();
   });
 });

@@ -1,6 +1,7 @@
 import { apiUrl } from "@/lib/backend";
 import type { GeoMunicipality, GeoSettlementDetail, GeoSettlementSummary } from "@/lib/atlas-types";
 import type { AtlasMapCollection } from "@/lib/atlas-map-types";
+import type { AtlasPoiCollection, AtlasPoiGroup, AtlasPoiListItem } from "@/lib/atlas-poi-types";
 
 export class AtlasNotFoundError extends Error {
   constructor(message = "Tražena atlas stranica nije pronađena.") {
@@ -51,4 +52,26 @@ export async function fetchAtlasSettlement(municipalitySlug: string, settlementS
 export async function fetchAtlasMapSettlements(municipalitySlug?: string): Promise<AtlasMapCollection> {
   const query = municipalitySlug ? `?municipality=${encodeURIComponent(municipalitySlug)}` : "";
   return atlasFetch(`/geo/map/settlements${query}`);
+}
+
+export async function fetchAtlasMapPlaces(options?: {
+  municipalitySlug?: string;
+  settlementSlug?: string;
+  family?: string;
+  type?: string;
+}): Promise<AtlasPoiCollection> {
+  const params = new URLSearchParams();
+  if (options?.municipalitySlug) params.set("municipality", options.municipalitySlug);
+  if (options?.settlementSlug) params.set("settlement", options.settlementSlug);
+  if (options?.family) params.set("family", options.family);
+  if (options?.type) params.set("type", options.type);
+  const query = params.toString() ? `?${params.toString()}` : "";
+  return atlasFetch(`/geo/map/places${query}`);
+}
+
+export async function fetchAtlasSettlementPlaces(
+  municipalitySlug: string,
+  settlementSlug: string,
+): Promise<{ groups: AtlasPoiGroup[]; places?: AtlasPoiListItem[]; meta?: { count: number; coverage_note?: string } }> {
+  return atlasFetch(`/geo/municipalities/${municipalitySlug}/settlements/${settlementSlug}/places`);
 }
