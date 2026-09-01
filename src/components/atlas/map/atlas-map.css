@@ -1,0 +1,66 @@
+.atlas-map-shell {
+  position: relative;
+  min-height: 18rem;
+}
+
+.atlas-map-canvas {
+  height: 22rem;
+  min-height: 18rem;
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: hsl(var(--muted));
+}
+
+@media (min-width: 640px) {
+  .atlas-map-canvas {
+    height: min(36rem, 70vh);
+  }
+}
+
+.atlas-map-shell .maplibregl-ctrl-attrib {
+  font-size: 10px;
+  line-height: 1.35;
+  max-width: min(100%, 28rem);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.atlas-map-shell .maplibregl-ctrl-attrib a {
+  color: inherit;
+}
+
+.atlas-map-overlay {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.atlas-map-overlay > * {
+  pointer-events: auto;
+}
+
+.atlas-map-legend,
+.atlas-map-controls,
+.atlas-map-popup {
+  border: 1px solid hsl(var(--border) / 0.8);
+  background: hsl(var(--card) / 0.96);
+  box-shadow: var(--shadow-card);
+  border-radius: 0.5rem;
+}
+
+.atlas-map-legend,
+.atlas-map-controls {
+  padding: 0.65rem 0.75rem;
+  max-width: 16.5rem;
+}
+
+.atlas-map-popup {
+  padding: 0.9rem 1rem;
+  width: min(22rem, calc(100% - 1rem));
+}
+
+@media (max-width: 639px) {
+  .atlas-map-popup {
+    width: calc(100% - 1rem);
+  }
+}

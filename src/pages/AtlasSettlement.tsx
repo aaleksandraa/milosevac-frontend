@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AtlasBreadcrumbs } from "@/components/atlas/AtlasBreadcrumbs";
 import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
 import { PopulationTable } from "@/components/atlas/PopulationTable";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
+import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasSettlement } from "@/hooks/useAtlas";
 import type { GeoGeography } from "@/lib/atlas-types";
 import { formatAreaKm2, formatBsNumber, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
@@ -78,6 +79,12 @@ const AtlasSettlement = () => {
             </p>
           ) : null}
         </header>
+
+        {municipality ? (
+          <div className="mt-6">
+            <SettlementAtlasMap settlement={settlement} municipalitySlug={municipality.slug} />
+          </div>
+        ) : null}
 
         {facts.length > 0 ? (
           <section className="mt-6" aria-labelledby="kljucne-cinjenice">
@@ -161,6 +168,27 @@ const AtlasSettlement = () => {
 };
 
 export default AtlasSettlement;
+
+function SettlementAtlasMap({
+  settlement,
+  municipalitySlug,
+}: {
+  settlement: { id: number; name: string; geography?: GeoGeography };
+  municipalitySlug: string;
+}) {
+  const hasGeometry = settlement.geography?.area_km2 !== undefined;
+  const [selectedId, setSelectedId] = useState<number | null>(hasGeometry ? settlement.id : null);
+
+  return (
+    <AtlasMap
+      municipalitySlug={municipalitySlug}
+      selectedSettlementId={selectedId}
+      onSelectedSettlementIdChange={setSelectedId}
+      missingBoundaryName={hasGeometry ? null : settlement.name}
+      fitSelected={hasGeometry}
+    />
+  );
+}
 
 function GeographySection({ geography }: { geography?: GeoGeography }) {
   if (!geography) return null;

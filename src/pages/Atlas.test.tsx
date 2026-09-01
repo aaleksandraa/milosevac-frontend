@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoMunicipality, GeoSettlementDetail } from "@/lib/atlas-types";
+import type { AtlasMapCollection } from "@/lib/atlas-map-types";
 import { atlasMatches, normalizeAtlasQuery } from "@/lib/atlas-search";
 import AtlasIndex from "./AtlasIndex";
 import AtlasMunicipality from "./AtlasMunicipality";
@@ -111,6 +112,43 @@ const njegosevo: GeoSettlementDetail = {
   source,
 };
 
+const mapCollection: AtlasMapCollection = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      id: 10,
+      properties: {
+        settlement_id: 10,
+        settlement_name: "Miloševac",
+        settlement_slug: "milosevac",
+        municipality_name: "Modriča",
+        municipality_slug: "modrica",
+        path: "/mjesta/modrica/milosevac",
+        area_km2: 17.42,
+        population_2013: 1366,
+        elevation_mean_m: 96.4,
+        elevation_min_m: 88,
+        elevation_max_m: 119,
+        slope_mean_deg: 2.45,
+      },
+      geometry: { type: "Polygon", coordinates: [] },
+    },
+  ],
+  meta: {
+    coverage_note: "U pilotu Modriča + Šamac granica postoji za 37 od 45 uvezenih naselja.",
+    boundary_note: "Granice prikazane na karti zasnovane su na dostupnim OpenStreetMap administrativnim poligonima.",
+    terrain_note: "Visinski podaci izvedeni su iz Copernicus DEM GLO-30 modela terena.",
+  },
+};
+
+const mapState = vi.hoisted(() => ({
+  collection: undefined as AtlasMapCollection | undefined,
+  loading: false,
+  error: false,
+  webglFailed: false,
+}));
+
 const hookState = {
   municipalities: municipalities as GeoMunicipality[],
   municipality: municipalities[0] as GeoMunicipality | undefined,
@@ -122,6 +160,25 @@ const hookState = {
 
 vi.mock("@/components/site/SiteLayout", () => ({
   SiteLayout: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock("@/hooks/useAtlasMapData", () => ({
+  useAtlasMapData: () => ({
+    collection: mapState.collection,
+    loading: mapState.loading,
+    error: mapState.error,
+    refetch: vi.fn(),
+  }),
+}));
+
+vi.mock("@/hooks/useMapLibre", () => ({
+  useMapLibre: () => ({
+    containerRef: { current: null },
+    mapRef: { current: null },
+    ready: false,
+    webglFailed: mapState.webglFailed,
+    basemapFailed: false,
+  }),
 }));
 
 vi.mock("@/hooks/useAtlas", () => ({
@@ -162,6 +219,10 @@ describe("atlas pages", () => {
     hookState.loading = false;
     hookState.error = false;
     hookState.notFound = false;
+    mapState.collection = mapCollection;
+    mapState.loading = false;
+    mapState.error = false;
+    mapState.webglFailed = false;
     vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   });
 
@@ -181,6 +242,8 @@ describe("atlas pages", () => {
     expect(screen.getByRole("link", { name: "Šamac" })).toHaveAttribute("href", "/mjesta/samac");
     expect(screen.getByText(/u fazi proširenja/)).toBeInTheDocument();
     expect(screen.getByText(/statistika.ba/)).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Karta naseljenih mjesta" })).toBeInTheDocument();
+    expect(screen.getByText(/OpenStreetMap administrativnim poligonima/)).toBeInTheDocument();
   });
 
   it("filters settlements with diacritic-insensitive search", () => {
@@ -192,8 +255,10 @@ describe("atlas pages", () => {
 
     fireEvent.change(screen.getByLabelText("Pretraga naselja i opština"), { target: { value: "Milosevac" } });
 
-    expect(screen.getByRole("link", { name: /Miloševac/ })).toHaveAttribute("href", "/mjesta/modrica/milosevac");
+    expect(screen.getAllByRole("link", { name: /Miloševac/ })[0]).toHaveAttribute("href", "/mjesta/modrica/milosevac");
     expect(screen.queryByRole("link", { name: "Šamac" })).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Miloševac" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Detalji o naselju" })).toHaveAttribute("href", "/mjesta/modrica/milosevac");
   });
 
   it("renders municipality settlements and source panel", () => {
@@ -209,6 +274,8 @@ describe("atlas pages", () => {
     expect(screen.getByRole("link", { name: "Miloševac" })).toHaveAttribute("href", "/mjesta/modrica/milosevac");
     expect(screen.getByText("1.366 stanovnika prema Popisu 2013.")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Izvor i metodologija" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Karta naseljenih mjesta" })).toBeInTheDocument();
+    expect(screen.getByLabelText("Prikaz")).toBeInTheDocument();
   });
 
   it("renders settlement 2013 population and municipality-qualified links", () => {
@@ -243,7 +310,7 @@ describe("atlas pages", () => {
     expect(screen.getByRole("heading", { name: "Geografija i teren" })).toBeInTheDocument();
     expect(screen.getByText("Prosječna nadmorska visina prema DEM-u")).toBeInTheDocument();
     expect(screen.getByText("0,0 m")).toBeInTheDocument();
-    expect(screen.getByText("17,42 km²")).toBeInTheDocument();
+    expect(screen.getAllByText("17,42 km²").length).toBeGreaterThan(0);
     expect(screen.getByText("Metodologija geografije i terena")).toBeInTheDocument();
     expect(screen.getAllByText(/Copernicus DEM/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("1.366 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
@@ -262,6 +329,7 @@ describe("atlas pages", () => {
 
     expect(screen.getAllByText("0 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
     expect(screen.queryByText("Za ovo naselje još nema uvezenih podataka o stanovništvu.")).not.toBeInTheDocument();
+    expect(screen.getByText(/Granica trenutno nije dostupna na karti za Njegoševo/)).toBeInTheDocument();
   });
 
   it("shows loading and error states", () => {

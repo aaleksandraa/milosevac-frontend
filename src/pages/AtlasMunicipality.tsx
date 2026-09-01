@@ -6,6 +6,7 @@ import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
 import { MunicipalityHeader } from "@/components/atlas/MunicipalityHeader";
 import { SettlementList } from "@/components/atlas/SettlementList";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
+import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasMunicipality } from "@/hooks/useAtlas";
 import { atlasMatches } from "@/lib/atlas-search";
 import { formatBsNumber, formatCensusHouseholds, formatCensusPopulation } from "@/lib/atlas-format";
@@ -32,6 +33,7 @@ const AtlasMunicipality = () => {
   const { municipality, loading, error, notFound } = useAtlasMunicipality(municipalitySlug);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortKey>("name");
+  const [selectedSettlementId, setSelectedSettlementId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!municipality) return;
@@ -43,6 +45,12 @@ const AtlasMunicipality = () => {
     const rows = (municipality?.settlements ?? []).filter((settlement) => atlasMatches(settlement.name, query));
     return sortSettlements(rows, sort);
   }, [municipality, query, sort]);
+
+  useEffect(() => {
+    if (query.trim() !== "" && settlements.length === 1) {
+      setSelectedSettlementId(settlements[0].id);
+    }
+  }, [query, settlements]);
 
   if (loading) {
     return <SiteLayout><div className="container-news py-16 text-center text-muted-foreground">Učitavam opštinu...</div></SiteLayout>;
@@ -102,6 +110,14 @@ const AtlasMunicipality = () => {
               hint={formatCensusHouseholds(population.households, population.year)}
             />
           ) : null}
+        </div>
+
+        <div className="mt-8">
+          <AtlasMap
+            municipalitySlug={municipality.slug}
+            selectedSettlementId={selectedSettlementId}
+            onSelectedSettlementIdChange={setSelectedSettlementId}
+          />
         </div>
 
         {municipality.settlement_count === 0 ? (

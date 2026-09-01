@@ -11,7 +11,8 @@ Branch (backend): `feature/bih-settlement-atlas`
 | M2 | Complete | Pilot Modriča + Šamac settlements from 2013 census fixture |
 | **M3** | **Complete** | Public `/api/geo` + `/mjesta` pages, SEO/sitemap |
 | **M4** | **Complete** | Settlement boundaries + DEM terrain stats (37/45 pilot) |
-| M5–M12 | Not started | Map, OSM POIs, climate, rankings, compare, national import |
+| **M5** | **Complete** | Interactive MapLibre atlas map (GeoJSON, OpenFreeMap) |
+| M6–M12 | Not started | OSM POIs, climate, rankings, compare, national import |
 
 ## M3 result
 
@@ -28,4 +29,11 @@ Branch (backend): `feature/bih-settlement-atlas`
 - Public `geography` API block + `/mjesta/...` “Geografija i teren”
 - See [M4_BOUNDARIES_TERRAIN.md](M4_BOUNDARIES_TERRAIN.md)
 
-M5 was not started.
+## M5 result
+
+- MapLibre 6.6 interactive map on `/mjesta`, municipality, and settlement routes
+- `GET /api/geo/map/settlements` GeoJSON (~381 KB, 37 features, no simplification)
+- OpenFreeMap Positron basemap; OSM + Copernicus attribution visible
+- See [M5_INTERACTIVE_MAP.md](M5_INTERACTIVE_MAP.md)
+
+M6 was not started.

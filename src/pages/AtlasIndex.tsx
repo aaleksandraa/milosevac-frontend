@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { MapPinned, Search } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
+import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasMunicipalities } from "@/hooks/useAtlas";
 import { atlasMatches } from "@/lib/atlas-search";
 import { formatBsNumber, formatCensusPopulation } from "@/lib/atlas-format";
@@ -10,6 +11,7 @@ import { formatBsNumber, formatCensusPopulation } from "@/lib/atlas-format";
 const AtlasIndex = () => {
   const { municipalities, loading, error } = useAtlasMunicipalities();
   const [query, setQuery] = useState("");
+  const [selectedSettlementId, setSelectedSettlementId] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = "Atlas naseljenih mjesta | Miloševac.com";
@@ -26,6 +28,15 @@ const AtlasIndex = () => {
         show: municipalityMatches || settlements.length > 0,
       };
     }).filter((row) => row.show);
+  }, [municipalities, query]);
+
+  useEffect(() => {
+    const matches = municipalities.flatMap((municipality) =>
+      (municipality.settlements ?? []).filter((settlement) => atlasMatches(settlement.name, query)),
+    );
+    if (query.trim() !== "" && matches.length === 1) {
+      setSelectedSettlementId(matches[0].id);
+    }
   }, [municipalities, query]);
 
   if (loading) {
@@ -53,6 +64,13 @@ const AtlasIndex = () => {
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Atlas naseljenih mjesta Bosne i Hercegovine je u fazi proširenja. Trenutno su dostupni pilot podaci za Modriču i Šamac.
           </p>
+        </div>
+
+        <div className="mb-6">
+          <AtlasMap
+            selectedSettlementId={selectedSettlementId}
+            onSelectedSettlementIdChange={setSelectedSettlementId}
+          />
         </div>
 
         <div className="mb-6">

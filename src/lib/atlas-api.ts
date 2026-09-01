@@ -1,5 +1,6 @@
 import { apiUrl } from "@/lib/backend";
 import type { GeoMunicipality, GeoSettlementDetail, GeoSettlementSummary } from "@/lib/atlas-types";
+import type { AtlasMapCollection } from "@/lib/atlas-map-types";
 
 export class AtlasNotFoundError extends Error {
   constructor(message = "Tražena atlas stranica nije pronađena.") {
@@ -45,4 +46,9 @@ export async function fetchAtlasSettlement(municipalitySlug: string, settlementS
     `/geo/municipalities/${municipalitySlug}/settlements/${settlementSlug}`,
   );
   return payload.settlement;
+}
+
+export async function fetchAtlasMapSettlements(municipalitySlug?: string): Promise<AtlasMapCollection> {
+  const query = municipalitySlug ? `?municipality=${encodeURIComponent(municipalitySlug)}` : "";
+  return atlasFetch(`/geo/map/settlements${query}`);
 }
