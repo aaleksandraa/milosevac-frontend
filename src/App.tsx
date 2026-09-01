@@ -4,6 +4,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index.tsx";
 
 const AboutMilosevac = lazy(() => import("./pages/AboutMilosevac.tsx"));
+const AtlasIndex = lazy(() => import("./pages/AtlasIndex.tsx"));
+const AtlasMunicipality = lazy(() => import("./pages/AtlasMunicipality.tsx"));
+const AtlasSettlement = lazy(() => import("./pages/AtlasSettlement.tsx"));
 const Article = lazy(() => import("./pages/Article.tsx"));
 const Category = lazy(() => import("./pages/Category.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
@@ -25,6 +28,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/omilosevcu" element={<AboutMilosevac />} />
+          <Route path="/mjesta" element={<AtlasIndex />} />
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+          <Route path="/mjesta/:municipalitySlug" element={<AtlasMunicipality />} />
           <Route path="/clanak/:slug" element={<Article />} />
           <Route path="/kategorija/:slug" element={<Category />} />
           <Route path="/fk-posavina" element={<FkPosavina />} />

@@ -8,18 +8,16 @@ Branch (backend): `feature/bih-settlement-atlas`
 |---|---|---|
 | M0 | Done | Audit and policy docs |
 | M1 | Complete | Core schema |
-| **M2** | **Complete** | Pilot Modriča + Šamac settlements from 2013 census fixture |
-| M3 | Not started | Public settlement page + `/api/geo` |
+| M2 | Complete | Pilot Modriča + Šamac settlements from 2013 census fixture |
+| **M3** | **Complete** | Public `/api/geo` + `/mjesta` pages, SEO/sitemap |
 | M4 | Not started | Boundaries + DEM (after spatial probe) |
-| M5–M12 | Not started | Map, OSM POIs, climate, rankings, compare, SEO, national import |
+| M5–M12 | Not started | Map, OSM POIs, climate, rankings, compare, national import |
 
-## M2 result
+## M3 result
 
-- 24 Modriča + 21 Šamac `geo_settlements`
-- 45 `settlement_population` rows for census year 2013
-- Command `atlas:import-settlements --pilot` is idempotent
-- See [M2_PILOT_SETTLEMENT_IMPORT.md](M2_PILOT_SETTLEMENT_IMPORT.md)
+- Read-only `/api/geo/municipalities` and nested settlement routes
+- `/mjesta`, `/mjesta/modrica`, `/mjesta/modrica/milosevac` (and Šamac)
+- `sitemap-settlements.xml` for the 45 indexable pilot settlements
+- See [M3_PUBLIC_ATLAS.md](M3_PUBLIC_ATLAS.md)
 
-## Recommended M3 (do not start until asked)
-
-Public `/mjesta/{opstina}/{naselje}` page, `/api/geo` resources, SEO/OG hooks, hide empty sections. Still no DEM/map/OSM national import.
+M4 was not started.

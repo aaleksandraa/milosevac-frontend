@@ -7,6 +7,7 @@ const portalLinks = [
   { label: "Vijesti", href: "/kategorija/vijesti" },
   { label: "Sport", href: "/kategorija/sport" },
   { label: "O Miloševcu", href: "/omilosevcu" },
+  { label: "Mjesta", href: "/mjesta" },
   { label: "FK Posavina", href: "/fk-posavina" },
   { label: "Vrijeme", href: "/vrijeme" },
   { label: "Kontakt", href: "/kontakt" },

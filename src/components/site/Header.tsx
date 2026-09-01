@@ -9,6 +9,7 @@ const navItems = [
   { label: "Naslovna", href: "/" },
   { label: "Vijesti", href: "/kategorija/vijesti" },
   { label: "Obavještenja", href: "/kategorija/vijesti?tag=obavjestenje" },
+  { label: "Mjesta", href: "/mjesta" },
   { label: "Prekidi struje", href: "/prekidi-struje" },
   { label: "FK Posavina", href: "/fk-posavina" },
   { label: "Kontakt", href: "/kontakt" },
@@ -17,6 +18,7 @@ const navItems = [
 function isActivePath(pathname: string, currentSearch: string, href: string) {
   const [path, search] = href.split("?");
   if (search) return pathname === path && currentSearch.includes(search);
+  if (path !== "/" && pathname.startsWith(`${path}/`)) return currentSearch === "";
   return pathname === path && currentSearch === "";
 }
 
