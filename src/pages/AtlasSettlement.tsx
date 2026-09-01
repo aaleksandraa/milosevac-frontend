@@ -6,7 +6,8 @@ import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
 import { PopulationTable } from "@/components/atlas/PopulationTable";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { useAtlasSettlement } from "@/hooks/useAtlas";
-import { formatBsNumber, formatCensusHouseholds, formatCensusPopulation } from "@/lib/atlas-format";
+import type { GeoGeography } from "@/lib/atlas-types";
+import { formatAreaKm2, formatBsNumber, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
 
 const AtlasSettlement = () => {
   const { municipalitySlug, settlementSlug } = useParams();
@@ -125,6 +126,8 @@ const AtlasSettlement = () => {
           </section>
         ) : null}
 
+        <GeographySection geography={settlement.geography} />
+
         <div className="mt-8">
           <SourcePanel source={settlement.source} />
         </div>
@@ -158,3 +161,83 @@ const AtlasSettlement = () => {
 };
 
 export default AtlasSettlement;
+
+function GeographySection({ geography }: { geography?: GeoGeography }) {
+  if (!geography) return null;
+  const terrain = geography.terrain;
+  const hasCards = geography.area_km2 !== undefined || terrain !== undefined;
+  if (!hasCards) return null;
+
+  const cards: Array<{ label: string; value: string; hint?: string }> = [];
+  if (geography.area_km2 !== undefined) {
+    cards.push({
+      label: "Površina",
+      value: formatAreaKm2(geography.area_km2),
+      hint: "Izvedeno iz poligona granice naselja",
+    });
+  }
+  if (terrain && terrain.elevation_min_m !== undefined && terrain.elevation_min_m !== null) {
+    cards.push({
+      label: "Najniža tačka",
+      value: formatElevationM(terrain.elevation_min_m),
+      hint: "Prema Copernicus DEM modelu terena",
+    });
+  }
+  if (terrain && terrain.elevation_max_m !== undefined && terrain.elevation_max_m !== null) {
+    cards.push({
+      label: "Najviša tačka",
+      value: formatElevationM(terrain.elevation_max_m),
+      hint: "Prema Copernicus DEM modelu terena",
+    });
+  }
+  if (terrain && terrain.elevation_mean_m !== undefined && terrain.elevation_mean_m !== null) {
+    cards.push({
+      label: "Prosječna nadmorska visina prema DEM-u",
+      value: formatElevationM(terrain.elevation_mean_m),
+      hint: "Raster-izvedeno, nije službena visina naselja",
+    });
+  }
+  if (terrain && terrain.elevation_median_m !== undefined && terrain.elevation_median_m !== null) {
+    cards.push({
+      label: "Medijalna nadmorska visina",
+      value: formatElevationM(terrain.elevation_median_m),
+      hint: "Prema Copernicus DEM modelu terena",
+    });
+  }
+  if (terrain && terrain.elevation_range_m !== undefined && terrain.elevation_range_m !== null) {
+    cards.push({
+      label: "Visinska razlika",
+      value: formatElevationM(terrain.elevation_range_m),
+      hint: "Maksimum minus minimum unutar granice",
+    });
+  }
+  if (terrain && terrain.slope_mean_deg !== undefined && terrain.slope_mean_deg !== null) {
+    cards.push({
+      label: "Prosječan nagib",
+      value: formatSlopeDeg(terrain.slope_mean_deg),
+      hint: "Horn 3×3 na DEM mreži",
+    });
+  }
+
+  if (cards.length === 0) return null;
+
+  return (
+    <section className="mt-8" aria-labelledby="geografija-teren">
+      <h2 id="geografija-teren" className="text-lg font-extrabold">Geografija i teren</h2>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        {cards.map((card) => (
+          <AtlasStatCard key={card.label} label={card.label} value={card.value} hint={card.hint} />
+        ))}
+      </div>
+      {geography.methodology ? (
+        <div className="mt-6">
+          <SourcePanel
+            source={geography.terrain_source ?? geography.boundary_source}
+            title="Metodologija geografije i terena"
+          />
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{geography.methodology}</p>
+        </div>
+      ) : null}
+    </section>
+  );
+}

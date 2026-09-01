@@ -79,6 +79,32 @@ export type GeoNeighbor = {
   path: string;
 };
 
+export type GeoTerrain = {
+  elevation_min_m: number;
+  elevation_max_m: number;
+  elevation_mean_m?: number | null;
+  elevation_median_m?: number | null;
+  elevation_range_m?: number | null;
+  slope_mean_deg?: number | null;
+  sample_count?: number;
+  quality_flag?: string;
+  dem_source?: string;
+  dem_version?: string;
+  dem_resolution_m?: number;
+  algorithm_version?: string;
+  calculated_at?: string | null;
+};
+
+export type GeoGeography = {
+  area_km2?: number;
+  area_algorithm?: string;
+  geographic_centroid?: { lat: number; lng: number };
+  terrain?: GeoTerrain;
+  boundary_source?: GeoSource;
+  terrain_source?: GeoSource;
+  methodology?: string;
+};
+
 export type GeoSettlementDetail = {
   id: number;
   name: string;
@@ -93,6 +119,7 @@ export type GeoSettlementDetail = {
   population?: GeoSettlementPopulation;
   census?: GeoCensusRecord[];
   points?: Array<{ type: string; lat: number; lng: number }>;
+  geography?: GeoGeography;
   neighbors?: {
     previous: GeoNeighbor | null;
     next: GeoNeighbor | null;

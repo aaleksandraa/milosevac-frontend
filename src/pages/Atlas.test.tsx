@@ -70,6 +70,34 @@ const milosevac: GeoSettlementDetail = {
   source,
 };
 
+const milosevacWithTerrain: GeoSettlementDetail = {
+  ...milosevac,
+  geography: {
+    area_km2: 17.42,
+    geographic_centroid: { lat: 44.9938, lng: 18.4062 },
+    terrain: {
+      elevation_min_m: 0,
+      elevation_max_m: 92.5,
+      elevation_mean_m: 86.1,
+      elevation_median_m: 85.4,
+      elevation_range_m: 92.5,
+      slope_mean_deg: 1.8,
+      dem_source: "Copernicus DEM GLO-30 Public",
+      dem_resolution_m: 30,
+      quality_flag: "ok",
+    },
+    terrain_source: {
+      name: "Copernicus DEM GLO-30 Public",
+      provider: "European Space Agency / European Commission",
+      source_class: "B",
+      source_class_label: "Javni naučni ili institucionalni skup",
+      dataset_version: "2021_1",
+      methodology_note: "Nadmorske visine su raster-izvedene iz Copernicus DEM GLO-30.",
+    },
+    methodology: "Nadmorske visine i nagib izračunati su iz Copernicus DEM GLO-30 (raster, ~30 m).",
+  },
+};
+
 const njegosevo: GeoSettlementDetail = {
   id: 20,
   name: "Njegoševo",
@@ -197,7 +225,28 @@ describe("atlas pages", () => {
     expect(screen.getByRole("heading", { name: "Izvor i metodologija" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Sva naselja u opštini Modriča" })).toHaveAttribute("href", "/mjesta/modrica");
     expect(screen.getByRole("link", { name: "Modriča →" })).toHaveAttribute("href", "/mjesta/modrica/modrica");
-    expect(screen.queryByText(/Elevation/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Geografija i teren" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Nadmorska visina$/)).not.toBeInTheDocument();
+  });
+
+  it("renders terrain section when geography data exists, including elevation 0", () => {
+    hookState.settlement = milosevacWithTerrain;
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Geografija i teren" })).toBeInTheDocument();
+    expect(screen.getByText("Prosječna nadmorska visina prema DEM-u")).toBeInTheDocument();
+    expect(screen.getByText("0,0 m")).toBeInTheDocument();
+    expect(screen.getByText("17,42 km²")).toBeInTheDocument();
+    expect(screen.getByText("Metodologija geografije i terena")).toBeInTheDocument();
+    expect(screen.getAllByText(/Copernicus DEM/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1.366 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
   });
 
   it("renders Njegoševo population 0 as sourced data", () => {
