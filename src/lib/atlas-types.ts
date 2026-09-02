@@ -23,13 +23,35 @@ export type GeoCanton = {
   slug: string;
 };
 
+export type GeoCensusComparability =
+  | "comparable"
+  | "comparable_with_caveat"
+  | "not_directly_comparable"
+  | "unresolved";
+
 export type GeoCensusRecord = {
   census_year: number;
   population: number;
   households?: number | null;
   statistical_settlement_code?: string | null;
+  comparability?: GeoCensusComparability;
+  mapping_status?: string;
+  historical_settlement_name?: string | null;
+  historical_municipality_name?: string | null;
+  reconciliation_note?: string | null;
   notes?: string | null;
   source?: GeoSource;
+};
+
+export type GeoPopulationChange = {
+  from_year: number;
+  to_year: number;
+  from_population: number;
+  to_population: number;
+  absolute_change: number;
+  percentage_change: number | null;
+  trend: "growth" | "decline" | "unchanged";
+  comparability: GeoCensusComparability;
 };
 
 export type GeoSettlementPopulation = {
@@ -179,6 +201,7 @@ export type GeoSettlementDetail = {
   entity?: GeoEntity;
   population?: GeoSettlementPopulation;
   census?: GeoCensusRecord[];
+  population_changes?: GeoPopulationChange[];
   points?: Array<{ type: string; lat: number; lng: number }>;
   geography?: GeoGeography;
   climate?: GeoClimate;

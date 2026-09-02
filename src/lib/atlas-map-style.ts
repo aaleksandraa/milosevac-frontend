@@ -54,6 +54,7 @@ const SCALES: Record<Exclude<AtlasThematicMode, "boundaries">, string[]> = {
   elevation_range: ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"],
   slope_mean: ["#f7f4f9", "#d4b9da", "#c994c7", "#df65b0", "#980043"],
   population_2013: ["#fff7ec", "#fee8c8", "#fdbb84", "#e34a33", "#b30000"],
+  population_change_1991_2013: ["#b2182b", "#ef8a62", "#f7f7f7", "#67a9cf", "#2166ac"],
   temperature_mean_annual: ["#ffffcc", "#ffeda0", "#feb24c", "#f03b20", "#bd0026"],
   precipitation_annual: ["#f7fbff", "#c6dbef", "#6baed6", "#2171b5", "#084594"],
 };
@@ -90,8 +91,33 @@ export function thematicFillExpression(
   const config = modeConfig(mode);
   if (!config.property) return BOUNDARY_FILL;
 
-  const domain = numericDomain(features, config.property);
   const colors = SCALES[mode];
+  if (mode === "population_change_1991_2013") {
+    const domain = divergingDomain(features, config.property);
+    if (!domain) return MISSING_VALUE_FILL;
+    return [
+      "case",
+      ["==", ["typeof", ["get", config.property]], "number"],
+      [
+        "interpolate",
+        ["linear"],
+        ["to-number", ["get", config.property]],
+        -domain,
+        colors[0],
+        -domain / 2,
+        colors[1],
+        0,
+        colors[2],
+        domain / 2,
+        colors[3],
+        domain,
+        colors[4],
+      ],
+      MISSING_VALUE_FILL,
+    ];
+  }
+
+  const domain = numericDomain(features, config.property);
   if (!domain) return MISSING_VALUE_FILL;
   if (domain.min === domain.max) return colors[Math.floor(colors.length / 2)];
 
@@ -115,13 +141,28 @@ export function legendStops(mode: AtlasThematicMode, features: AtlasMapFeature[]
   }
   const config = modeConfig(mode);
   if (!config.property) return [];
-  const domain = numericDomain(features, config.property);
   const colors = SCALES[mode];
+  if (mode === "population_change_1991_2013") {
+    const abs = divergingDomain(features, config.property);
+    if (abs === null) return [];
+    return colors.map((color, index) => ({
+      color,
+      value: -abs + (index / (colors.length - 1)) * (2 * abs),
+    }));
+  }
+  const domain = numericDomain(features, config.property);
   if (!domain) return [];
   return colors.map((color, index) => ({
     color,
     value: domain.min + (index / (colors.length - 1)) * (domain.max - domain.min),
   }));
+}
+
+function divergingDomain(features: AtlasMapFeature[], property: keyof AtlasMapFeatureProperties): number | null {
+  const domain = numericDomain(features, property);
+  if (!domain) return null;
+  const abs = Math.max(Math.abs(domain.min), Math.abs(domain.max), 0.1);
+  return abs;
 }
 
 export function findMapFeature(collection: AtlasMapCollection | undefined, settlementId: number | null | undefined): AtlasMapFeature | undefined {

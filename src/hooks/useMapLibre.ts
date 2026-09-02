@@ -37,6 +37,7 @@ export function useMapLibre(enabled: boolean) {
               'Objekti © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
               "Visine: Copernicus DEM GLO-30",
               "Klima: ERA5-Land / ERA5, Copernicus C3S / ECMWF",
+              "Promjena stanovništva: Popis 1991. i 2013.",
             ],
           },
           cooperativeGestures: true,

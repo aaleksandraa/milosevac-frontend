@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AtlasBreadcrumbs } from "@/components/atlas/AtlasBreadcrumbs";
 import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
-import { PopulationTable } from "@/components/atlas/PopulationTable";
+import { PopulationSection } from "@/components/atlas/PopulationSection";
 import { ClimateSection } from "@/components/atlas/ClimateSection";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
@@ -12,7 +12,7 @@ import { useAtlasSettlementPlaces } from "@/hooks/useAtlasPoiData";
 import type { GeoGeography } from "@/lib/atlas-types";
 import type { AtlasPoiGroup } from "@/lib/atlas-poi-types";
 import { poiDisplayLabel } from "@/lib/atlas-poi-types";
-import { formatAreaKm2, formatBsNumber, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
+import { formatAreaKm2, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
 
 const AtlasSettlement = () => {
   const { municipalitySlug, settlementSlug } = useParams();
@@ -50,6 +50,7 @@ const AtlasSettlement = () => {
 
   const municipality = settlement.municipality;
   const census = settlement.census ?? [];
+  const changes = settlement.population_changes ?? [];
   const facts = [
     municipality ? ["Jedinica lokalne samouprave", `${municipality.admin_type_label} ${municipality.name}`] : null,
     settlement.entity ? ["Entitet", settlement.entity.name] : null,
@@ -104,38 +105,11 @@ const AtlasSettlement = () => {
           </section>
         ) : null}
 
-        {settlement.population ? (
-          <section className="mt-8" aria-labelledby="stanovnistvo">
-            <h2 id="stanovnistvo" className="text-lg font-extrabold">Stanovništvo</h2>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <AtlasStatCard
-                label={`Popis ${settlement.population.year}.`}
-                value={formatBsNumber(settlement.population.population)}
-                hint={formatCensusPopulation(settlement.population.population, settlement.population.year)}
-              />
-              {settlement.population.households !== null && settlement.population.households !== undefined ? (
-                <AtlasStatCard
-                  label="Domaćinstva"
-                  value={formatBsNumber(settlement.population.households)}
-                  hint={formatCensusHouseholds(settlement.population.households, settlement.population.year)}
-                />
-              ) : null}
-            </div>
-          </section>
-        ) : (
-          <p className="editorial-panel mt-8 py-8 text-center text-muted-foreground">
-            Za ovo naselje još nema uvezenih podataka o stanovništvu.
-          </p>
-        )}
-
-        {census.length > 0 ? (
-          <section className="editorial-panel mt-8 p-5 sm:p-6" aria-labelledby="popis-tabela">
-            <h2 id="popis-tabela" className="text-lg font-extrabold">Podaci popisa</h2>
-            <div className="mt-4">
-              <PopulationTable records={census} />
-            </div>
-          </section>
-        ) : null}
+        <PopulationSection
+          latest={settlement.population}
+          census={census}
+          changes={changes}
+        />
 
         <GeographySection geography={settlement.geography} />
 

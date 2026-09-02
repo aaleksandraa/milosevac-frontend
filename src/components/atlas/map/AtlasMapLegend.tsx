@@ -33,7 +33,7 @@ export function AtlasMapLegend({
             <span>{formatLegendValue(stops[stops.length - 1].value, config.unit)}</span>
           </div>
           <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-            Skala je izvedena iz trenutno učitanih poligona (linearna interpolacija). Jedinica: {config.unit || "broj stanovnika"}.
+            Skala je izvedena iz trenutno učitanih poligona ({mode === "population_change_1991_2013" ? "divergirajuća, 0% u sredini" : "linearna interpolacija"}). Jedinica: {config.unit || "broj stanovnika"}.
             {config.legendNote ? ` ${config.legendNote}` : ""}
           </p>
         </div>
@@ -49,5 +49,8 @@ function formatLegendValue(value: number, unit: string): string {
   if (unit === "°") return formatSlopeDeg(value);
   if (unit === "°C") return formatTemperatureC(value);
   if (unit === "mm") return formatPrecipitationMm(value);
+  if (unit === "%") {
+    return `${value.toLocaleString("bs-BA", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}%`;
+  }
   return formatBsNumber(Math.round(value));
 }

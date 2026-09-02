@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoMunicipality, GeoSettlementDetail } from "@/lib/atlas-types";
 import type { AtlasMapCollection } from "@/lib/atlas-map-types";
 import { climateChartPoints } from "@/lib/atlas-climate";
+import { censusChartPoints, censusDifferenceSentence } from "@/lib/atlas-population";
 import { atlasMatches, normalizeAtlasQuery } from "@/lib/atlas-search";
 import AtlasIndex from "./AtlasIndex";
 import AtlasMunicipality from "./AtlasMunicipality";
@@ -54,6 +55,16 @@ const municipalities: GeoMunicipality[] = [
   },
 ];
 
+const historicalSource = {
+  name: "Popis stanovništva 1991. — uporedni podaci 1971, 1981. i 1991. (naseljena mjesta)",
+  provider: "Federalni zavod za statistiku Federacije Bosne i Hercegovine",
+  source_class: "A",
+  source_class_label: "Službeni izvor",
+  dataset_version: "bilten-265-1998",
+  retrieval_date: "2026-09-02",
+  methodology_note: "Uporedni podaci Popisa 1971, 1981. i 1991. Historijska opština je izvorni popisni kontekst.",
+};
+
 const milosevac: GeoSettlementDetail = {
   id: 10,
   name: "Miloševac",
@@ -64,7 +75,18 @@ const milosevac: GeoSettlementDetail = {
   municipality: municipalities[0],
   entity: municipalities[0].entity,
   population: { year: 2013, population: 1366, households: 469 },
-  census: [{ census_year: 2013, population: 1366, households: 469, source }],
+  census: [
+    { census_year: 2013, population: 1366, households: 469, comparability: "comparable", source },
+    { census_year: 1991, population: 1735, comparability: "comparable", historical_settlement_name: "Miloševac", historical_municipality_name: "Modriča", source: historicalSource },
+    { census_year: 1981, population: 1825, comparability: "comparable", source: historicalSource },
+    { census_year: 1971, population: 1880, comparability: "comparable", source: historicalSource },
+  ],
+  population_changes: [
+    { from_year: 1971, to_year: 1981, from_population: 1880, to_population: 1825, absolute_change: -55, percentage_change: -2.9, trend: "decline", comparability: "comparable" },
+    { from_year: 1981, to_year: 1991, from_population: 1825, to_population: 1735, absolute_change: -90, percentage_change: -4.9, trend: "decline", comparability: "comparable" },
+    { from_year: 1991, to_year: 2013, from_population: 1735, to_population: 1366, absolute_change: -369, percentage_change: -21.3, trend: "decline", comparability: "comparable" },
+    { from_year: 1971, to_year: 2013, from_population: 1880, to_population: 1366, absolute_change: -514, percentage_change: -27.3, trend: "decline", comparability: "comparable" },
+  ],
   neighbors: {
     previous: { name: "Kužnjača", slug: "kuznjaca", path: "/mjesta/modrica/kuznjaca" },
     next: { name: "Modriča", slug: "modrica", path: "/mjesta/modrica/modrica" },
@@ -392,6 +414,85 @@ describe("atlas pages", () => {
     expect(screen.queryByText(/Nadmorska visina$/)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Objekti i sadržaji" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Klima" })).not.toBeInTheDocument();
+  });
+
+  it("renders historical census series, chart years, change copy and source years", () => {
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Kretanje broja stanovnika" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Kretanje broja stanovnika prema popisima 1971, 1981, 1991, 2013/ })).toBeInTheDocument();
+    expect(censusChartPoints(milosevac.census ?? []).map((row) => row.year)).toEqual([1971, 1981, 1991, 2013]);
+    expect(screen.getAllByText("1.880").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1.825").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("1.735").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("-21,3%").length).toBeGreaterThan(0);
+    expect(screen.getByText(censusDifferenceSentence(1991, 1735, 2013, 1366))).toBeInTheDocument();
+    expect(screen.getByText(/U odnosu na Popis 1991, Popis 2013 bilježi 369 stanovnika manje/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Izvor popisa 1991." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Izvor i metodologija" })).toBeInTheDocument();
+  });
+
+  it("omits missing census years and keeps sourced zero", () => {
+    hookState.settlement = {
+      ...njegosevo,
+      census: [{ census_year: 2013, population: 0, households: 0, comparability: "comparable", source }],
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/samac/njegosevo"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getAllByText("0 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("rowheader", { name: "1971" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /Kretanje broja stanovnika/ })).not.toBeInTheDocument();
+  });
+
+  it("shows comparability caveat when the series is comparable with caveat", () => {
+    hookState.settlement = {
+      ...milosevac,
+      census: [
+        { census_year: 2013, population: 1366, households: 469, comparability: "comparable", source },
+        {
+          census_year: 1991,
+          population: 147,
+          comparability: "comparable_with_caveat",
+          reconciliation_note: "Isti identitet, ali granice nisu nužno iste.",
+          source: historicalSource,
+        },
+      ],
+      population_changes: [
+        {
+          from_year: 1991,
+          to_year: 2013,
+          from_population: 147,
+          to_population: 1366,
+          absolute_change: 1219,
+          percentage_change: 829.3,
+          trend: "growth",
+          comparability: "comparable_with_caveat",
+        },
+      ],
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("note")).toHaveTextContent(/administrativne ili statističke granice/);
   });
 
   it("renders terrain section when geography data exists, including elevation 0", () => {

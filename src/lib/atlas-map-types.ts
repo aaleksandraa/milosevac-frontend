@@ -4,6 +4,7 @@ export type AtlasThematicMode =
   | "elevation_range"
   | "slope_mean"
   | "population_2013"
+  | "population_change_1991_2013"
   | "temperature_mean_annual"
   | "precipitation_annual";
 
@@ -17,6 +18,7 @@ export type AtlasMapFeatureProperties = {
   indexable?: boolean;
   area_km2?: number;
   population_2013?: number;
+  population_change_1991_2013_pct?: number;
   elevation_min_m?: number;
   elevation_max_m?: number;
   elevation_mean_m?: number;
@@ -51,6 +53,7 @@ export type AtlasMapMeta = {
   terrain_note?: string;
   coverage_note?: string;
   climate_note?: string;
+  population_change_note?: string;
 };
 
 export type AtlasMapCollection = {
@@ -96,6 +99,14 @@ export const THEMATIC_MODES: Array<{
     property: "population_2013",
     unit: "",
     legendTitle: "Stanovništvo — Popis 2013",
+  },
+  {
+    id: "population_change_1991_2013",
+    label: "Promjena 1991–2013.",
+    property: "population_change_1991_2013_pct",
+    unit: "%",
+    legendTitle: "Promjena broja stanovnika, Popis 1991 → Popis 2013",
+    legendNote: "Razlika popisa za uporediva naselja. Nije uzrok niti procjena za 2026.",
   },
   {
     id: "temperature_mean_annual",

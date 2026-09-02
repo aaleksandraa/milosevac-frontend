@@ -14,7 +14,8 @@ Branch (backend): `feature/bih-settlement-atlas`
 | **M5** | **Complete** | Interactive MapLibre atlas map (GeoJSON, OpenFreeMap) |
 | **M6** | **Complete** | Settlement POI catalog + OSM import (761 unique pilot objects) |
 | **M7** | **Complete** | ERA5-Land / ERA5 climate normals + historical analytics (pilot) |
-| M8–M12 | Not started | Land cover, rankings, compare, national import |
+| **M8** | **Complete** | Historical settlement population 1971/1981/1991 + change analytics (pilot) |
+| M9–M12 | Not started | Rankings, compare, land cover, national import |
 
 ## M3 result
 
@@ -52,4 +53,11 @@ Branch (backend): `feature/bih-settlement-atlas`
 - Public `climate` API block + Klima section + map temperature/precipitation modes
 - See [M7_CLIMATE.md](M7_CLIMATE.md)
 
-M8 was not started.
+## M8 result
+
+- Settlement population history 1971/1981/1991 for defensibly mapped pilot identities; 2013 remains M2
+- `settlement_census_mappings` + checked-in mapping fixture; no fuzzy auto-match
+- Public series, change cards, numeric-year chart, 1991–2013 map mode (comparable only)
+- See [M8_HISTORICAL_POPULATION.md](M8_HISTORICAL_POPULATION.md)
+
+M9 was not started.

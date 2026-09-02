@@ -22,6 +22,7 @@ const mapState = vi.hoisted(() => ({
           path: "/mjesta/modrica/milosevac",
           area_km2: 17.42,
           population_2013: 1366,
+          population_change_1991_2013_pct: -21.3,
           elevation_mean_m: 96.4,
           elevation_min_m: 0,
           elevation_max_m: 119,
@@ -179,6 +180,9 @@ describe("atlas map", () => {
     expect(screen.getByText("Prosječna nadmorska visina prema DEM-u")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "population_2013" } });
     expect(screen.getByText("Stanovništvo — Popis 2013")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "population_change_1991_2013" } });
+    expect(screen.getByText("Promjena broja stanovnika, Popis 1991 → Popis 2013")).toBeInTheDocument();
+    expect(screen.getByText(/Jedinica: %/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "temperature_mean_annual" } });
     expect(screen.getAllByText("Prosječna godišnja temperatura").length).toBeGreaterThan(0);
     expect(screen.getByText(/ERA5-Land reanaliza, period 1991–2020/)).toBeInTheDocument();
@@ -195,6 +199,7 @@ describe("atlas map", () => {
 
     expect(screen.getByRole("dialog", { name: "Njegoševo" })).toBeInTheDocument();
     expect(screen.getByText("0 stanovnika")).toBeInTheDocument();
+    expect(screen.queryByRole("dialog", { name: "Njegoševo" })).not.toHaveTextContent("Promjena 1991–2013.");
     expect(screen.getByRole("link", { name: "Detalji o naselju" })).toHaveAttribute("href", "/mjesta/samac/njegosevo");
   });
 

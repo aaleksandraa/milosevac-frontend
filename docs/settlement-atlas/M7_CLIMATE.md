@@ -1,6 +1,6 @@
 # M7 — Settlement climate analytics (frontend)
 
-**Status: implemented** on `feature/bih-settlement-atlas`. **M8 was not started.**
+**Status: implemented** on `feature/bih-settlement-atlas`.
 
 Companion: backend `docs/settlement-atlas/M7_CLIMATE.md`.
 

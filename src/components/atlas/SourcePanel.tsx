@@ -4,10 +4,12 @@ export function SourcePanel({
   source,
   title = "Izvor i metodologija",
   headingId = "atlas-izvor",
+  extraItems,
 }: {
   source?: GeoSource | null;
   title?: string;
   headingId?: string;
+  extraItems?: Array<[string, string]>;
 }) {
   if (!source) return null;
 
@@ -18,6 +20,7 @@ export function SourcePanel({
     source.retrieval_date ? ["Preuzeto", source.retrieval_date] : null,
     source.source_class_label ? ["Klasa", `${source.source_class_label} (${source.source_class})`] : null,
     source.attribution ? ["Atribucija", source.attribution] : null,
+    ...(extraItems ?? []),
   ].filter((item): item is [string, string] => item !== null);
 
   return (

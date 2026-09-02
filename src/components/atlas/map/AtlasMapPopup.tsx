@@ -15,6 +15,9 @@ export function AtlasMapPopup({
     properties.population_2013 !== undefined
       ? ["Stanovništvo 2013.", `${formatBsNumber(properties.population_2013)} stanovnika`]
       : null,
+    properties.population_change_1991_2013_pct !== undefined
+      ? ["Promjena 1991–2013.", `${properties.population_change_1991_2013_pct.toLocaleString("bs-BA", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`]
+      : null,
     properties.area_km2 !== undefined ? ["Površina", formatAreaKm2(properties.area_km2)] : null,
     properties.elevation_mean_m !== undefined
       ? ["Prosječna visina prema DEM-u", formatElevationM(properties.elevation_mean_m)]
