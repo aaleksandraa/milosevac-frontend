@@ -162,7 +162,8 @@ export function AtlasMap({
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           Granice prikazane na karti zasnovane su na dostupnim OpenStreetMap administrativnim poligonima i ne predstavljaju nužno
           službene katastarske ili statističke granice naseljenih mjesta. Visinski podaci izvedeni su iz Copernicus DEM GLO-30
-          modela terena. Objekti su uvezeni OSM zapisi (ODbL), nisu službeni inventar.
+          modela terena. Klimatske vrijednosti su ERA5-Land / ERA5 reanaliza za 1991–2020, ne mjerenja meteorološke stanice.
+          Objekti su uvezeni OSM zapisi (ODbL), nisu službeni inventar.
         </p>
       </div>
 

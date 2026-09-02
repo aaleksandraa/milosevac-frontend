@@ -36,6 +36,7 @@ export function useMapLibre(enabled: boolean) {
               'Granice naselja © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
               'Objekti © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors (ODbL)',
               "Visine: Copernicus DEM GLO-30",
+              "Klima: ERA5-Land / ERA5, Copernicus C3S / ECMWF",
             ],
           },
           cooperativeGestures: true,

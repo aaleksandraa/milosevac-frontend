@@ -3,7 +3,9 @@ export type AtlasThematicMode =
   | "elevation_mean"
   | "elevation_range"
   | "slope_mean"
-  | "population_2013";
+  | "population_2013"
+  | "temperature_mean_annual"
+  | "precipitation_annual";
 
 export type AtlasMapFeatureProperties = {
   settlement_id: number;
@@ -23,6 +25,10 @@ export type AtlasMapFeatureProperties = {
   slope_mean_deg?: number;
   boundary_source_type?: string;
   terrain_quality_flag?: string;
+  temperature_mean_annual_c?: number;
+  precipitation_annual_mm?: number;
+  climate_quality_flag?: string;
+  climate_normal_period?: string;
 };
 
 export type AtlasMapFeature = {
@@ -38,11 +44,13 @@ export type AtlasMapFeature = {
 export type AtlasMapMeta = {
   boundary_source_type?: string;
   terrain_source_type?: string;
+  climate_source_type?: string;
   geometry_strategy?: string;
   feature_count?: number;
   boundary_note?: string;
   terrain_note?: string;
   coverage_note?: string;
+  climate_note?: string;
 };
 
 export type AtlasMapCollection = {
@@ -58,6 +66,7 @@ export const THEMATIC_MODES: Array<{
   property: keyof AtlasMapFeatureProperties | null;
   unit: string;
   legendTitle: string;
+  legendNote?: string;
 }> = [
   { id: "boundaries", label: "Granice", property: null, unit: "", legendTitle: "Granice naselja" },
   {
@@ -87,5 +96,21 @@ export const THEMATIC_MODES: Array<{
     property: "population_2013",
     unit: "",
     legendTitle: "Stanovništvo — Popis 2013",
+  },
+  {
+    id: "temperature_mean_annual",
+    label: "Prosječna godišnja temperatura",
+    property: "temperature_mean_annual_c",
+    unit: "°C",
+    legendTitle: "Prosječna godišnja temperatura",
+    legendNote: "ERA5-Land reanaliza, period 1991–2020. Nisu mjerenja meteorološke stanice.",
+  },
+  {
+    id: "precipitation_annual",
+    label: "Godišnje padavine",
+    property: "precipitation_annual_mm",
+    unit: "mm",
+    legendTitle: "Godišnje padavine",
+    legendNote: "ERA5 reanaliza, period 1991–2020. Nisu mjerenja meteorološke stanice.",
   },
 ];

@@ -28,6 +28,8 @@ export const OSM_POI_ATTRIBUTION =
 
 export const COPERNICUS_ATTRIBUTION = "Visine: Copernicus DEM GLO-30";
 
+export const ERA5_ATTRIBUTION = "Klima: ERA5-Land / ERA5, Copernicus C3S / ECMWF";
+
 export const BASEMAP_ATTRIBUTION_NOTE =
   "Podloga karte: OpenFreeMap (podaci OpenStreetMap / OpenMapTiles). Javna instanca, bez API ključa; atribucija je obavezna.";
 
@@ -52,6 +54,8 @@ const SCALES: Record<Exclude<AtlasThematicMode, "boundaries">, string[]> = {
   elevation_range: ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"],
   slope_mean: ["#f7f4f9", "#d4b9da", "#c994c7", "#df65b0", "#980043"],
   population_2013: ["#fff7ec", "#fee8c8", "#fdbb84", "#e34a33", "#b30000"],
+  temperature_mean_annual: ["#ffffcc", "#ffeda0", "#feb24c", "#f03b20", "#bd0026"],
+  precipitation_annual: ["#f7fbff", "#c6dbef", "#6baed6", "#2171b5", "#084594"],
 };
 
 export type AtlasMapSourceSpec =

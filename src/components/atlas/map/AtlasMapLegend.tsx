@@ -1,4 +1,4 @@
-import { formatAreaKm2, formatBsNumber, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
+import { formatAreaKm2, formatBsNumber, formatElevationM, formatPrecipitationMm, formatSlopeDeg, formatTemperatureC } from "@/lib/atlas-format";
 import { legendStops, modeConfig } from "@/lib/atlas-map-style";
 import type { AtlasMapFeature, AtlasThematicMode } from "@/lib/atlas-map-types";
 
@@ -34,6 +34,7 @@ export function AtlasMapLegend({
           </div>
           <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
             Skala je izvedena iz trenutno učitanih poligona (linearna interpolacija). Jedinica: {config.unit || "broj stanovnika"}.
+            {config.legendNote ? ` ${config.legendNote}` : ""}
           </p>
         </div>
       )}
@@ -46,5 +47,7 @@ function formatLegendValue(value: number, unit: string): string {
   if (!Number.isFinite(value)) return "";
   if (unit === "m") return formatElevationM(value);
   if (unit === "°") return formatSlopeDeg(value);
+  if (unit === "°C") return formatTemperatureC(value);
+  if (unit === "mm") return formatPrecipitationMm(value);
   return formatBsNumber(Math.round(value));
 }

@@ -27,6 +27,8 @@ const mapState = vi.hoisted(() => ({
           elevation_max_m: 119,
           elevation_range_m: 31,
           slope_mean_deg: 2.45,
+          temperature_mean_annual_c: 0,
+          precipitation_annual_mm: 0,
         },
         geometry: { type: "Polygon", coordinates: [] },
       },
@@ -177,6 +179,11 @@ describe("atlas map", () => {
     expect(screen.getByText("Prosječna nadmorska visina prema DEM-u")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "population_2013" } });
     expect(screen.getByText("Stanovništvo — Popis 2013")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "temperature_mean_annual" } });
+    expect(screen.getAllByText("Prosječna godišnja temperatura").length).toBeGreaterThan(0);
+    expect(screen.getByText(/ERA5-Land reanaliza, period 1991–2020/)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "precipitation_annual" } });
+    expect(screen.getAllByText("Godišnje padavine").length).toBeGreaterThan(0);
   });
 
   it("displays population 0 in the selected card", () => {

@@ -19,6 +19,14 @@ export function formatElevationM(value: number): string {
   return `${formatBsDecimal(value, 1)} m`;
 }
 
+export function formatTemperatureC(value: number): string {
+  return `${formatBsDecimal(value, 1)} °C`;
+}
+
+export function formatPrecipitationMm(value: number): string {
+  return `${formatBsDecimal(value, 1)} mm`;
+}
+
 export function formatSlopeDeg(value: number): string {
   return `${formatBsDecimal(value, 1)}°`;
 }

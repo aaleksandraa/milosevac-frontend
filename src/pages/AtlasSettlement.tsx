@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { AtlasBreadcrumbs } from "@/components/atlas/AtlasBreadcrumbs";
 import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
 import { PopulationTable } from "@/components/atlas/PopulationTable";
+import { ClimateSection } from "@/components/atlas/ClimateSection";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { useAtlasSettlement } from "@/hooks/useAtlas";
@@ -138,6 +139,8 @@ const AtlasSettlement = () => {
 
         <GeographySection geography={settlement.geography} />
 
+        <ClimateSection climate={settlement.climate} />
+
         {municipality ? (
           <SettlementPlacesSection municipalitySlug={municipality.slug} settlementSlug={settlement.slug} />
         ) : null}
@@ -269,6 +272,7 @@ function GeographySection({ geography }: { geography?: GeoGeography }) {
           <SourcePanel
             source={geography.terrain_source ?? geography.boundary_source}
             title="Metodologija geografije i terena"
+            headingId="geografija-metodologija"
           />
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{geography.methodology}</p>
         </div>

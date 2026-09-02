@@ -105,6 +105,67 @@ export type GeoGeography = {
   methodology?: string;
 };
 
+export type GeoClimateMonth = {
+  month: number;
+  temperature_mean_c: number | null;
+  temperature_mean_min_c: number | null;
+  temperature_mean_max_c: number | null;
+  precipitation_mean_mm: number | null;
+};
+
+export type GeoClimateIndex = {
+  code: string;
+  value: number | null;
+  threshold?: number;
+  unit?: string;
+  definition?: string;
+};
+
+export type GeoClimateExtreme = {
+  metric_code: string;
+  value: number | null;
+  unit: string;
+  occurred_on?: string | null;
+  period_start?: string | null;
+  period_end?: string | null;
+  kind?: string;
+  wording?: string | null;
+};
+
+export type GeoClimate = {
+  normal_period: string;
+  normal_period_start?: string | null;
+  normal_period_end?: string | null;
+  historical_period_start?: string | null;
+  historical_period_end?: string | null;
+  annual: {
+    temperature_mean_c: number | null;
+    precipitation_mm: number | null;
+    coldest_month?: number | null;
+    warmest_month?: number | null;
+    wettest_month?: number | null;
+    driest_month?: number | null;
+    temperature_range_c?: number | null;
+    temperature_mean_1961_1990_c?: number | null;
+    temperature_mean_change_c?: number | null;
+  };
+  monthly: GeoClimateMonth[];
+  indices?: GeoClimateIndex[];
+  extremes?: GeoClimateExtreme[];
+  methodology?: {
+    text: string;
+    spatial_method?: string;
+    source_resolution_km?: number | null;
+    grid_cell_count?: number;
+    algorithm_version?: string;
+    quality_flag?: string;
+    timezone?: string;
+    temperature_dataset?: string;
+    precipitation_dataset?: string;
+  };
+  source?: GeoSource | null;
+};
+
 export type GeoSettlementDetail = {
   id: number;
   name: string;
@@ -120,6 +181,7 @@ export type GeoSettlementDetail = {
   census?: GeoCensusRecord[];
   points?: Array<{ type: string; lat: number; lng: number }>;
   geography?: GeoGeography;
+  climate?: GeoClimate;
   neighbors?: {
     previous: GeoNeighbor | null;
     next: GeoNeighbor | null;

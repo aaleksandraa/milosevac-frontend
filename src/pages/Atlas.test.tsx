@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GeoMunicipality, GeoSettlementDetail } from "@/lib/atlas-types";
 import type { AtlasMapCollection } from "@/lib/atlas-map-types";
+import { climateChartPoints } from "@/lib/atlas-climate";
 import { atlasMatches, normalizeAtlasQuery } from "@/lib/atlas-search";
 import AtlasIndex from "./AtlasIndex";
 import AtlasMunicipality from "./AtlasMunicipality";
@@ -99,6 +100,69 @@ const milosevacWithTerrain: GeoSettlementDetail = {
   },
 };
 
+const climateMonthly = [
+  { month: 1, temperature_mean_c: 0, temperature_mean_min_c: -4.1, temperature_mean_max_c: 4.2, precipitation_mean_mm: 0 },
+  { month: 2, temperature_mean_c: 2.1, temperature_mean_min_c: -2.8, temperature_mean_max_c: 7.0, precipitation_mean_mm: 42 },
+  { month: 3, temperature_mean_c: 6.4, temperature_mean_min_c: 1.2, temperature_mean_max_c: 11.8, precipitation_mean_mm: 55 },
+  { month: 4, temperature_mean_c: 11.2, temperature_mean_min_c: 5.4, temperature_mean_max_c: 17.0, precipitation_mean_mm: 62 },
+  { month: 5, temperature_mean_c: 16.1, temperature_mean_min_c: 10.0, temperature_mean_max_c: 22.2, precipitation_mean_mm: 78 },
+  { month: 6, temperature_mean_c: 19.8, temperature_mean_min_c: 13.6, temperature_mean_max_c: 26.0, precipitation_mean_mm: 92 },
+  { month: 7, temperature_mean_c: 21.4, temperature_mean_min_c: 15.0, temperature_mean_max_c: 28.1, precipitation_mean_mm: 71 },
+  { month: 8, temperature_mean_c: 21.0, temperature_mean_min_c: 14.7, temperature_mean_max_c: 27.8, precipitation_mean_mm: 68 },
+  { month: 9, temperature_mean_c: 16.4, temperature_mean_min_c: 10.5, temperature_mean_max_c: 22.6, precipitation_mean_mm: 64 },
+  { month: 10, temperature_mean_c: 11.0, temperature_mean_min_c: 5.8, temperature_mean_max_c: 16.6, precipitation_mean_mm: 61 },
+  { month: 11, temperature_mean_c: 6.2, temperature_mean_min_c: 1.8, temperature_mean_max_c: 10.9, precipitation_mean_mm: 70 },
+  { month: 12, temperature_mean_c: 1.4, temperature_mean_min_c: -2.6, temperature_mean_max_c: 5.4, precipitation_mean_mm: 57 },
+];
+
+const milosevacWithClimate: GeoSettlementDetail = {
+  ...milosevacWithTerrain,
+  climate: {
+    normal_period: "1991–2020",
+    historical_period_start: "1950-01-01",
+    historical_period_end: "2025-12-31",
+    annual: {
+      temperature_mean_c: 11.6,
+      precipitation_mm: 780,
+      coldest_month: 1,
+      warmest_month: 7,
+      temperature_mean_change_c: 0.7,
+    },
+    monthly: climateMonthly,
+    indices: [
+      { code: "hot_days_30c", value: 18.2, threshold: 30, definition: "dnevni Tmax ≥ 30 °C" },
+      { code: "frost_days", value: 72.4, threshold: 0, definition: "dnevni Tmin < 0 °C" },
+      { code: "precipitation_days_1mm", value: 110, threshold: 1, definition: "dnevne padavine ≥ 1 mm" },
+    ],
+    extremes: [
+      {
+        metric_code: "daily_tmax_max",
+        value: 39.4,
+        unit: "°C",
+        occurred_on: "2007-07-24",
+        period_start: "1950-01-01",
+        period_end: "2025-12-31",
+        wording: "Najviša dnevna maksimalna temperatura u analiziranom ERA5-Land nizu",
+        kind: "gridded_reanalysis_extreme",
+      },
+    ],
+    methodology: {
+      text: "Vrijednosti su izvedene iz ERA5-Land reanalize (Copernicus C3S / ECMWF) za područje naselja.",
+      timezone: "Europe/Sarajevo",
+      temperature_dataset: "ERA5-Land",
+      precipitation_dataset: "ERA5",
+      quality_flag: "coarse_spatial_resolution",
+    },
+    source: {
+      name: "Copernicus Climate Change Service — ERA5-Land",
+      provider: "Copernicus Climate Change Service / ECMWF",
+      source_class: "B",
+      source_class_label: "Javni naučni ili institucionalni skup",
+      methodology_note: "Klimatološki podaci su ERA5-Land reanaliza za područje naselja.",
+    },
+  },
+};
+
 const njegosevo: GeoSettlementDetail = {
   id: 20,
   name: "Njegoševo",
@@ -131,6 +195,8 @@ const mapCollection: AtlasMapCollection = {
         elevation_min_m: 88,
         elevation_max_m: 119,
         slope_mean_deg: 2.45,
+        temperature_mean_annual_c: 11.6,
+        precipitation_annual_mm: 780,
       },
       geometry: { type: "Polygon", coordinates: [] },
     },
@@ -325,6 +391,7 @@ describe("atlas pages", () => {
     expect(screen.queryByRole("heading", { name: "Geografija i teren" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Nadmorska visina$/)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Objekti i sadržaji" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Klima" })).not.toBeInTheDocument();
   });
 
   it("renders terrain section when geography data exists, including elevation 0", () => {
@@ -345,6 +412,50 @@ describe("atlas pages", () => {
     expect(screen.getByText("Metodologija geografije i terena")).toBeInTheDocument();
     expect(screen.getAllByText(/Copernicus DEM/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("1.366 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
+  });
+
+  it("renders climate section with zeros, period, table, chart and reanalysis wording", () => {
+    hookState.settlement = milosevacWithClimate;
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Klima" })).toBeInTheDocument();
+    expect(screen.getAllByText(/1991–2020/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("0,0 °C").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("0,0 mm").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("11,6 °C").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("780,0 mm").length).toBeGreaterThan(0);
+    expect(screen.getByRole("table", { name: /Mjesečne klimatske normale/ })).toBeInTheDocument();
+    expect(screen.getAllByText("januar").length).toBeGreaterThan(0);
+    expect(screen.getByRole("img", { name: /Mjesečni klimatski dijagram/ })).toBeInTheDocument();
+    expect(climateChartPoints(milosevacWithClimate.climate!)).toHaveLength(12);
+    expect(screen.getByText(/Ekstremi u analiziranom ERA5-Land nizu/)).toBeInTheDocument();
+    expect(screen.getByText(/Najviša dnevna maksimalna temperatura u analiziranom ERA5-Land nizu/)).toBeInTheDocument();
+    expect(screen.queryByText(/Apsolutni rekord/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Metodologija klime" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Geografija i teren" })).toBeInTheDocument();
+    expect(screen.getAllByText("1.366 stanovnika prema Popisu 2013.").length).toBeGreaterThan(0);
+  });
+
+  it("hides climate when the API omits the block", () => {
+    hookState.settlement = milosevacWithTerrain;
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Geografija i teren" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Klima" })).not.toBeInTheDocument();
   });
 
   it("renders Njegoševo population 0 as sourced data", () => {

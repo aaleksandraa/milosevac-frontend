@@ -1,6 +1,14 @@
 import type { GeoSource } from "@/lib/atlas-types";
 
-export function SourcePanel({ source, title = "Izvor i metodologija" }: { source?: GeoSource | null; title?: string }) {
+export function SourcePanel({
+  source,
+  title = "Izvor i metodologija",
+  headingId = "atlas-izvor",
+}: {
+  source?: GeoSource | null;
+  title?: string;
+  headingId?: string;
+}) {
   if (!source) return null;
 
   const items = [
@@ -13,8 +21,8 @@ export function SourcePanel({ source, title = "Izvor i metodologija" }: { source
   ].filter((item): item is [string, string] => item !== null);
 
   return (
-    <aside className="editorial-panel p-5 sm:p-6" aria-labelledby="atlas-izvor">
-      <h2 id="atlas-izvor" className="text-lg font-extrabold">{title}</h2>
+    <aside className="editorial-panel p-5 sm:p-6" aria-labelledby={headingId}>
+      <h2 id={headingId} className="text-lg font-extrabold">{title}</h2>
       <dl className="mt-4 grid gap-3 text-sm">
         {items.map(([label, value]) => (
           <div key={label}>

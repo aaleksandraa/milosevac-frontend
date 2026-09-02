@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatAreaKm2, formatBsNumber, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
+import { formatAreaKm2, formatBsNumber, formatElevationM, formatPrecipitationMm, formatSlopeDeg, formatTemperatureC } from "@/lib/atlas-format";
 import { settlementPath } from "@/lib/atlas-map-style";
 import type { AtlasMapFeatureProperties } from "@/lib/atlas-map-types";
 
@@ -23,6 +23,12 @@ export function AtlasMapPopup({
       ? ["Raspon visine", `${formatElevationM(properties.elevation_min_m)} – ${formatElevationM(properties.elevation_max_m)}`]
       : null,
     properties.slope_mean_deg !== undefined ? ["Prosječan nagib", formatSlopeDeg(properties.slope_mean_deg)] : null,
+    properties.temperature_mean_annual_c !== undefined
+      ? ["Prosječna godišnja temperatura", formatTemperatureC(properties.temperature_mean_annual_c)]
+      : null,
+    properties.precipitation_annual_mm !== undefined
+      ? ["Godišnje padavine", formatPrecipitationMm(properties.precipitation_annual_mm)]
+      : null,
   ].filter((item): item is [string, string] => item !== null);
 
   return (
