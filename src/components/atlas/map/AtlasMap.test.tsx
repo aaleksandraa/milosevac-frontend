@@ -73,6 +73,20 @@ vi.mock("@/hooks/useAtlasMapData", () => ({
   },
 }));
 
+vi.mock("@/hooks/useAtlas", () => ({
+  useAtlasRankings: () => ({
+    rankings: {
+      eligible: 37,
+      entries: [
+        { rank: 31, eligible: 37, settlement: { id: 10 } },
+        { rank: 20, eligible: 37, settlement: { id: 20 } },
+      ],
+    },
+    loading: false,
+    error: false,
+  }),
+}));
+
 const poiState = vi.hoisted(() => ({
   collection: {
     type: "FeatureCollection",
@@ -167,6 +181,8 @@ describe("atlas map", () => {
     expect(screen.getByText("Prosječna visina prema DEM-u")).toBeInTheDocument();
     expect(screen.getByText("96,4 m")).toBeInTheDocument();
     expect(screen.getByText("0,0 m – 119,0 m")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "elevation_mean" } });
+    expect(screen.getByText("31. od 37")).toBeInTheDocument();
   });
 
   it("changes legend with thematic mode", () => {

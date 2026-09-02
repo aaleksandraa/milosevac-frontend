@@ -1,6 +1,6 @@
 # M8 — Historical census population (frontend)
 
-**Status: implemented** on `feature/bih-settlement-atlas`. **M9 was not started.**
+**Status: implemented** on `feature/bih-settlement-atlas`.
 
 Public settlement pages show **Kretanje broja stanovnika** from the settlement API series. Only actual census years are plotted (1971, 1981, 1991, 2013 where available). The SVG chart uses a **numeric year axis** so 1991→2013 occupies more horizontal space than 1981→1991. Missing years are omitted; sourced **0** remains 0.
 

@@ -6,9 +6,13 @@ import type { AtlasMapCollection } from "@/lib/atlas-map-types";
 import { climateChartPoints } from "@/lib/atlas-climate";
 import { censusChartPoints, censusDifferenceSentence } from "@/lib/atlas-population";
 import { atlasMatches, normalizeAtlasQuery } from "@/lib/atlas-search";
+import { comparePath, relativeFactSentence } from "@/lib/atlas-ranking";
+import type { AtlasComparePayload, AtlasMetricDefinition, AtlasRankingTable } from "@/lib/atlas-ranking-types";
 import AtlasIndex from "./AtlasIndex";
 import AtlasMunicipality from "./AtlasMunicipality";
 import AtlasSettlement from "./AtlasSettlement";
+import AtlasCompare from "./AtlasCompare";
+import AtlasRankings from "./AtlasRankings";
 
 const source = {
   name: "Popis stanovništva, domaćinstava i stanova 2013. — naseljena mjesta",
@@ -91,7 +95,187 @@ const milosevac: GeoSettlementDetail = {
     previous: { name: "Kužnjača", slug: "kuznjaca", path: "/mjesta/modrica/kuznjaca" },
     next: { name: "Modriča", slug: "modrica", path: "/mjesta/modrica/modrica" },
   },
+  relative_facts: [
+    {
+      metric: "population_2013",
+      label: "Stanovništvo prema Popisu 2013.",
+      short_label: "Popis 2013.",
+      value: 1366,
+      unit: "",
+      rank: 18,
+      eligible: 45,
+      percentile_strictly_above: 60,
+      percentile_strictly_below: 38,
+      direction: "desc",
+      scope: "pilot",
+      scope_note: "među trenutno obrađenim naseljima (Modriča i Šamac)",
+      eligibility_note: "Naselje ima uvezeni zapis Popisa 2013.",
+      methodology: "Popis 2013.",
+      source_family: "population",
+    },
+    {
+      metric: "area_km2",
+      label: "Površina granice naselja",
+      short_label: "Površina",
+      value: 17.42,
+      unit: "km²",
+      rank: 12,
+      eligible: 37,
+      percentile_strictly_above: 67,
+      percentile_strictly_below: 32,
+      direction: "desc",
+      scope: "pilot",
+      scope_note: "među trenutno obrađenim naseljima (Modriča i Šamac)",
+      eligibility_note: "Naselje ima važeći OSM poligon.",
+      methodology: "OSM",
+      source_family: "geography",
+    },
+  ],
   source,
+};
+
+const rankingMetrics: AtlasMetricDefinition[] = [
+  {
+    code: "population_2013",
+    label: "Stanovništvo prema Popisu 2013.",
+    short_label: "Popis 2013.",
+    unit: "",
+    source_family: "population",
+    category: "population",
+    category_label: "Stanovništvo",
+    default_direction: "desc",
+    allows_both_directions: true,
+    rankable: true,
+    zero_is_valid: true,
+    precision: 0,
+    ranking_method: "competition",
+    high_semantic_label: "najviše stanovnika",
+    low_semantic_label: "najmanje stanovnika",
+    percentage_difference_useful: true,
+    methodology: "Popis 2013.",
+    eligibility: "Uvezeni Popis 2013.",
+    high_ranking_label: "Najviše stanovnika",
+    low_ranking_label: "Najmanje stanovnika",
+  },
+  {
+    code: "elevation_mean_m",
+    label: "Prosječna nadmorska visina",
+    short_label: "Prosječna visina",
+    unit: "m",
+    source_family: "terrain",
+    category: "geography",
+    category_label: "Geografija i teren",
+    default_direction: "desc",
+    allows_both_directions: true,
+    rankable: true,
+    zero_is_valid: true,
+    precision: 1,
+    ranking_method: "competition",
+    high_semantic_label: "najviša",
+    low_semantic_label: "najnija",
+    percentage_difference_useful: false,
+    methodology: "Copernicus DEM GLO-30.",
+    eligibility: "Terenski profil.",
+    high_ranking_label: "Najviša prosječna nadmorska visina",
+    low_ranking_label: "Najniža prosječna nadmorska visina",
+  },
+];
+
+const rankingTable: AtlasRankingTable = {
+  metric: rankingMetrics[0],
+  scope: "pilot",
+  scope_label: "Trenutno obrađena naselja",
+  scope_note: "među trenutno obrađenim naseljima (Modriča i Šamac)",
+  direction: "desc",
+  ranking_method: "competition",
+  eligible: 45,
+  missing: 0,
+  universe: 45,
+  limit: 10,
+  entries: [
+    {
+      rank: 1,
+      value: 9419,
+      percentile_strictly_above: 0,
+      percentile_strictly_below: 98,
+      tie_count: 1,
+      eligible: 45,
+      settlement: { id: 11, name: "Modriča", slug: "modrica", path: "/mjesta/modrica/modrica", municipality: { name: "Modriča", slug: "modrica" } },
+    },
+    {
+      rank: 2,
+      value: 1366,
+      percentile_strictly_above: 2,
+      percentile_strictly_below: 96,
+      tie_count: 2,
+      eligible: 45,
+      settlement: { id: 10, name: "Miloševac", slug: "milosevac", path: "/mjesta/modrica/milosevac", municipality: { name: "Modriča", slug: "modrica" } },
+    },
+    {
+      rank: 2,
+      value: 1366,
+      percentile_strictly_above: 2,
+      percentile_strictly_below: 96,
+      tie_count: 2,
+      eligible: 45,
+      settlement: { id: 21, name: "Obudovac", slug: "obudovac", path: "/mjesta/samac/obudovac", municipality: { name: "Šamac", slug: "samac" } },
+    },
+  ],
+};
+
+const comparison: AtlasComparePayload = {
+  a: { id: 10, name: "Miloševac", slug: "milosevac", path: "/mjesta/modrica/milosevac", municipality: { name: "Modriča", slug: "modrica", path: "/mjesta/modrica" } },
+  b: { id: 30, name: "Šamac", slug: "samac", path: "/mjesta/samac/samac", municipality: { name: "Šamac", slug: "samac", path: "/mjesta/samac" } },
+  sections: [
+    {
+      code: "population",
+      label: "Stanovništvo",
+      rows: [
+        {
+          metric: "population_2013",
+          label: "Stanovništvo prema Popisu 2013.",
+          short_label: "Popis 2013.",
+          unit: "",
+          a: { value: 1366 },
+          b: { value: 5133 },
+          difference: { absolute: -3767, percentage: -73.4 },
+          comparable: true,
+          source_family: "population",
+          methodology: "Popis 2013.",
+        },
+        {
+          metric: "population_change_1991_2013_pct",
+          label: "Promjena broja stanovnika 1991–2013. (%)",
+          short_label: "Promjena 1991–2013.",
+          unit: "%",
+          a: { value: -21.3 },
+          b: { value: -17.7 },
+          difference: { absolute: -3.6, percentage: null },
+          comparable: true,
+          caveat: "Istorijski podaci su povezani sa današnjim naseljem, ali administrativne ili statističke granice kroz vrijeme nisu nužno potpuno iste.",
+          source_family: "population",
+          methodology: "Popis.",
+        },
+      ],
+    },
+    {
+      code: "climate",
+      label: "Klima",
+      rows: [
+        {
+          metric: "temperature_mean_annual_c",
+          label: "Prosječna godišnja temperatura",
+          short_label: "Prosječna temperatura",
+          unit: "°C",
+          a: { value: 11.6 },
+          b: { value: null, unavailable_reason: "Nema dostupnog podatka" },
+          comparable: false,
+          source_family: "climate",
+          methodology: "ERA5-Land.",
+        },
+      ],
+    },
+  ],
 };
 
 const milosevacWithTerrain: GeoSettlementDetail = {
@@ -255,6 +439,9 @@ const hookState = {
     website?: string | null;
     phone?: string | null;
   }> }>,
+  metrics: rankingMetrics,
+  rankings: rankingTable as AtlasRankingTable | undefined,
+  comparison: comparison as AtlasComparePayload | undefined,
 };
 
 vi.mock("@/components/site/SiteLayout", () => ({
@@ -317,6 +504,18 @@ vi.mock("@/hooks/useAtlas", () => ({
     error: hookState.error,
     notFound: hookState.notFound,
   }),
+  useAtlasMetrics: () => ({ metrics: hookState.metrics, loading: false, error: false }),
+  useAtlasRankings: () => ({
+    rankings: hookState.rankings,
+    loading: false,
+    error: false,
+  }),
+  useAtlasCompare: () => ({
+    comparison: hookState.comparison,
+    loading: hookState.loading,
+    error: hookState.error,
+    notFound: hookState.notFound,
+  }),
 }));
 
 describe("atlas search", () => {
@@ -337,6 +536,9 @@ describe("atlas pages", () => {
     hookState.error = false;
     hookState.notFound = false;
     hookState.placeGroups = [];
+    hookState.metrics = rankingMetrics;
+    hookState.rankings = rankingTable;
+    hookState.comparison = comparison;
     mapState.collection = mapCollection;
     mapState.loading = false;
     mapState.error = false;
@@ -628,5 +830,61 @@ describe("atlas pages", () => {
     expect(screen.getByText("Fudbalski teren")).toBeInTheDocument();
     expect(screen.getByText(/U trenutno dostupnim podacima/)).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Zdravstvo" })).not.toBeInTheDocument();
+  });
+
+  it("shows settlement relative facts and compare launcher", () => {
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Položaj među obrađenim naseljima" })).toBeInTheDocument();
+    expect(screen.getByText(relativeFactSentence(milosevac.relative_facts![0]))).toBeInTheDocument();
+    expect(screen.getByText(/12\. od 37 naselja/)).toBeInTheDocument();
+    expect(screen.getByText(/nisu rangovi Bosne i Hercegovine/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Poređenje sa drugim naseljima" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Uporedi" })).toBeInTheDocument();
+  });
+
+  it("renders municipality-qualified compare headers, swap, missing climate and caveat", () => {
+    render(
+      <MemoryRouter initialEntries={["/uporedi/modrica/milosevac/samac/samac"]}>
+        <Routes>
+          <Route path="/uporedi/:municipalityA/:settlementA/:municipalityB/:settlementB" element={<AtlasCompare />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Miloševac" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Šamac" })).toBeInTheDocument();
+    expect(screen.getAllByText("Modriča").length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Zamijeni" })).toBeInTheDocument();
+    expect(screen.getByText("Nema dostupnog podatka")).toBeInTheDocument();
+    expect(screen.queryByText(/^0$/)).not.toBeInTheDocument();
+    expect(screen.getByText(/granice kroz vrijeme nisu nužno potpuno iste/)).toBeInTheDocument();
+    expect(comparePath("modrica", "milosevac", "samac", "samac")).toBe("/uporedi/modrica/milosevac/samac/samac");
+  });
+
+  it("renders rankings with ties, eligible denominator and pilot wording", () => {
+    render(
+      <MemoryRouter initialEntries={["/rang-liste"]}>
+        <AtlasRankings />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Rang-liste naselja" })).toBeInTheDocument();
+    expect(screen.getAllByText(/trenutno obrađenim naseljima/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/nisu rang-liste Bosne i Hercegovine/)).toBeInTheDocument();
+    expect(screen.getByText("1.")).toBeInTheDocument();
+    expect(screen.getAllByText("2.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/2\. od 45/).length).toBe(2);
+    expect(screen.getAllByText(/izjednačeno/).length).toBe(2);
+    expect(screen.getByLabelText("Pokazatelj")).toBeInTheDocument();
+    expect(screen.getByLabelText("Obuhvat")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Obuhvat"), { target: { value: "municipality" } });
+    expect(screen.getByLabelText("Opština")).toBeInTheDocument();
   });
 });

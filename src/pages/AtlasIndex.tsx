@@ -83,6 +83,10 @@ const AtlasIndex = () => {
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
             Atlas naseljenih mjesta Bosne i Hercegovine je u fazi proširenja. Trenutno su dostupni pilot podaci za Modriču i Šamac.
           </p>
+          <p className="mt-3 text-sm">
+            <Link to="/rang-liste" className="action-link mr-4">Rang-liste</Link>
+            <Link to="/uporedi/modrica/milosevac/samac/samac" className="action-link">Uporedi naselja</Link>
+          </p>
         </div>
 
         <div className="mb-6">

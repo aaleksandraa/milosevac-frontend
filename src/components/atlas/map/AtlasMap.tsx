@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { MapLayerMouseEvent } from "maplibre-gl";
+import { useAtlasRankings } from "@/hooks/useAtlas";
 import { useAtlasMapData } from "@/hooks/useAtlasMapData";
+import { metricForThematicMode } from "@/lib/atlas-ranking";
 import { useAtlasPoiData } from "@/hooks/useAtlasPoiData";
 import { useMapLibre } from "@/hooks/useMapLibre";
 import { AtlasMapControls } from "@/components/atlas/map/AtlasMapControls";
@@ -47,6 +49,13 @@ export function AtlasMap({
   const { collection: poiCollection, error: poiError } = useAtlasPoiData(municipalitySlug);
   const { containerRef, mapRef, ready, webglFailed, basemapFailed } = useMapLibre(true);
   const [mode, setMode] = useState<AtlasThematicMode>("boundaries");
+  const rankingMetric = metricForThematicMode(mode);
+  const { rankings } = useAtlasRankings({
+    metric: rankingMetric ?? undefined,
+    scope: "pilot",
+    limit: "all",
+    enabled: rankingMetric !== null,
+  });
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [poiGroupId, setPoiGroupId] = useState("all");
   const [internalPoiId, setInternalPoiId] = useState<number | null>(null);
@@ -63,6 +72,9 @@ export function AtlasMap({
 
   const selectedFeature = findMapFeature(collection, selectedSettlementId);
   const selectedProperties = selectedFeature?.properties;
+  const selectedRank = selectedProperties && rankings
+    ? rankings.entries.find((entry) => entry.settlement.id === selectedProperties.settlement_id)
+    : undefined;
   const selectedPoi = findPoiFeature(poiCollection, activePoiId)?.properties;
   const poiFamilies = useMemo(
     () => POI_FILTER_GROUPS.find((group) => group.id === poiGroupId)?.families ?? [],
@@ -217,7 +229,11 @@ export function AtlasMap({
           </div>
         ) : selectedProperties ? (
           <div className="atlas-map-overlay bottom-2 left-2 right-2 sm:left-3 sm:right-auto">
-            <AtlasMapPopup properties={selectedProperties} onClose={() => onSelectedSettlementIdChange?.(null)} />
+            <AtlasMapPopup
+              properties={selectedProperties}
+              rank={selectedRank ? { rank: selectedRank.rank, eligible: selectedRank.eligible ?? rankings.eligible } : null}
+              onClose={() => onSelectedSettlementIdChange?.(null)}
+            />
           </div>
         ) : null}
       </div>

@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import {
   AtlasNotFoundError,
+  fetchAtlasCompare,
+  fetchAtlasMetrics,
   fetchAtlasMunicipalities,
   fetchAtlasMunicipality,
+  fetchAtlasRankings,
   fetchAtlasSettlement,
 } from "@/lib/atlas-api";
 
@@ -58,6 +61,78 @@ export function useAtlasSettlement(municipalitySlug: string | undefined, settlem
 
   return {
     settlement: query.data,
+    loading: enabled && query.isPending,
+    error: query.isError,
+    notFound: query.error instanceof AtlasNotFoundError,
+  };
+}
+
+export function useAtlasMetrics() {
+  const query = useQuery({
+    queryKey: ["atlas", "metrics"],
+    queryFn: fetchAtlasMetrics,
+    ...atlasQueryOptions,
+  });
+
+  return {
+    metrics: query.data?.metrics ?? [],
+    loading: query.isPending,
+    error: query.isError,
+  };
+}
+
+export function useAtlasRankings(params: {
+  metric?: string;
+  scope?: "pilot" | "municipality";
+  municipality?: string;
+  direction?: "asc" | "desc";
+  limit?: string | number;
+  enabled?: boolean;
+}) {
+  const enabled = (params.enabled ?? true) && Boolean(params.metric);
+  const query = useQuery({
+    queryKey: ["atlas", "rankings", params.metric, params.scope, params.municipality, params.direction, params.limit],
+    queryFn: () =>
+      fetchAtlasRankings({
+        metric: params.metric as string,
+        scope: params.scope,
+        municipality: params.municipality,
+        direction: params.direction,
+        limit: params.limit,
+      }),
+    enabled,
+    ...atlasQueryOptions,
+  });
+
+  return {
+    rankings: query.data,
+    loading: enabled && query.isPending,
+    error: query.isError,
+  };
+}
+
+export function useAtlasCompare(
+  municipalityA: string | undefined,
+  settlementA: string | undefined,
+  municipalityB: string | undefined,
+  settlementB: string | undefined,
+) {
+  const enabled = Boolean(municipalityA && settlementA && municipalityB && settlementB);
+  const query = useQuery({
+    queryKey: ["atlas", "compare", municipalityA, settlementA, municipalityB, settlementB],
+    queryFn: () =>
+      fetchAtlasCompare(
+        municipalityA as string,
+        settlementA as string,
+        municipalityB as string,
+        settlementB as string,
+      ),
+    enabled,
+    ...atlasQueryOptions,
+  });
+
+  return {
+    comparison: query.data,
     loading: enabled && query.isPending,
     error: query.isError,
     notFound: query.error instanceof AtlasNotFoundError,

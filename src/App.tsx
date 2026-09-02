@@ -7,6 +7,8 @@ const AboutMilosevac = lazy(() => import("./pages/AboutMilosevac.tsx"));
 const AtlasIndex = lazy(() => import("./pages/AtlasIndex.tsx"));
 const AtlasMunicipality = lazy(() => import("./pages/AtlasMunicipality.tsx"));
 const AtlasSettlement = lazy(() => import("./pages/AtlasSettlement.tsx"));
+const AtlasCompare = lazy(() => import("./pages/AtlasCompare.tsx"));
+const AtlasRankings = lazy(() => import("./pages/AtlasRankings.tsx"));
 const Article = lazy(() => import("./pages/Article.tsx"));
 const Category = lazy(() => import("./pages/Category.tsx"));
 const Contact = lazy(() => import("./pages/Contact.tsx"));
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/mjesta" element={<AtlasIndex />} />
           <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
           <Route path="/mjesta/:municipalitySlug" element={<AtlasMunicipality />} />
+          <Route path="/uporedi/:municipalityA/:settlementA/:municipalityB/:settlementB" element={<AtlasCompare />} />
+          <Route path="/rang-liste" element={<AtlasRankings />} />
           <Route path="/clanak/:slug" element={<Article />} />
           <Route path="/kategorija/:slug" element={<Category />} />
           <Route path="/fk-posavina" element={<FkPosavina />} />

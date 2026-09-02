@@ -15,7 +15,8 @@ Branch (backend): `feature/bih-settlement-atlas`
 | **M6** | **Complete** | Settlement POI catalog + OSM import (761 unique pilot objects) |
 | **M7** | **Complete** | ERA5-Land / ERA5 climate normals + historical analytics (pilot) |
 | **M8** | **Complete** | Historical settlement population 1971/1981/1991 + change analytics (pilot) |
-| M9–M12 | Not started | Rankings, compare, land cover, national import |
+| **M9** | **Complete** | Comparison + rankings engine (pilot + municipality scopes) |
+| M10–M12 | Not started | Land cover, national import, … |
 
 ## M3 result
 
@@ -60,4 +61,10 @@ Branch (backend): `feature/bih-settlement-atlas`
 - Public series, change cards, numeric-year chart, 1991–2013 map mode (comparable only)
 - See [M8_HISTORICAL_POPULATION.md](M8_HISTORICAL_POPULATION.md)
 
-M9 was not started.
+## M9 result
+
+- Municipality-qualified `/uporedi/...` and `/rang-liste`
+- Settlement relative facts + map popup rank for existing thematic metrics
+- See [M9_COMPARISON_RANKINGS.md](M9_COMPARISON_RANKINGS.md)
+
+M10 was not started.

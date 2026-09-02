@@ -2,13 +2,16 @@ import { Link } from "react-router-dom";
 import { formatAreaKm2, formatBsNumber, formatElevationM, formatPrecipitationMm, formatSlopeDeg, formatTemperatureC } from "@/lib/atlas-format";
 import { settlementPath } from "@/lib/atlas-map-style";
 import type { AtlasMapFeatureProperties } from "@/lib/atlas-map-types";
+import type { AtlasRankingEntry } from "@/lib/atlas-ranking-types";
 
 export function AtlasMapPopup({
   properties,
   onClose,
+  rank,
 }: {
   properties: AtlasMapFeatureProperties;
   onClose: () => void;
+  rank?: Pick<AtlasRankingEntry, "rank" | "eligible"> | null;
 }) {
   const href = settlementPath(properties);
   const facts = [
@@ -59,6 +62,12 @@ export function AtlasMapPopup({
             <dd className="font-bold text-right">{value}</dd>
           </div>
         ))}
+        {rank ? (
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-foreground">Rang među obrađenim naseljima</dt>
+            <dd className="font-bold text-right">{rank.rank}. od {rank.eligible}</dd>
+          </div>
+        ) : null}
       </dl>
       <Link to={href} className="action-link mt-4">
         Detalji o naselju

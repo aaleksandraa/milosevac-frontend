@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AtlasBreadcrumbs } from "@/components/atlas/AtlasBreadcrumbs";
 import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
@@ -7,16 +7,20 @@ import { PopulationSection } from "@/components/atlas/PopulationSection";
 import { ClimateSection } from "@/components/atlas/ClimateSection";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
-import { useAtlasSettlement } from "@/hooks/useAtlas";
+import { AtlasRelativeFacts } from "@/components/atlas/AtlasRelativeFacts";
+import { AtlasSettlementSelect } from "@/components/atlas/AtlasSettlementSelect";
+import { useAtlasMunicipalities, useAtlasSettlement } from "@/hooks/useAtlas";
 import { useAtlasSettlementPlaces } from "@/hooks/useAtlasPoiData";
 import type { GeoGeography } from "@/lib/atlas-types";
 import type { AtlasPoiGroup } from "@/lib/atlas-poi-types";
 import { poiDisplayLabel } from "@/lib/atlas-poi-types";
 import { formatAreaKm2, formatCensusHouseholds, formatCensusPopulation, formatElevationM, formatSlopeDeg } from "@/lib/atlas-format";
+import { comparePath, settlementOptionsFromMunicipalities } from "@/lib/atlas-ranking";
 
 const AtlasSettlement = () => {
   const { municipalitySlug, settlementSlug } = useParams();
   const { settlement, loading, error, notFound } = useAtlasSettlement(municipalitySlug, settlementSlug);
+  const { municipalities } = useAtlasMunicipalities();
 
   useEffect(() => {
     if (!settlement) return;
@@ -114,6 +118,19 @@ const AtlasSettlement = () => {
         <GeographySection geography={settlement.geography} />
 
         <ClimateSection climate={settlement.climate} />
+
+        {settlement.relative_facts && settlement.relative_facts.length > 0 ? (
+          <AtlasRelativeFacts facts={settlement.relative_facts} />
+        ) : null}
+
+        {municipality && municipalitySlug && settlementSlug ? (
+          <SettlementCompareLauncher
+            municipalities={municipalities}
+            municipalitySlug={municipalitySlug}
+            settlementSlug={settlementSlug}
+            settlementName={settlement.name}
+          />
+        ) : null}
 
         {municipality ? (
           <SettlementPlacesSection municipalitySlug={municipality.slug} settlementSlug={settlement.slug} />
@@ -298,5 +315,62 @@ function PoiFamilyGroup({ group }: { group: AtlasPoiGroup }) {
         })}
       </ul>
     </div>
+  );
+}
+
+function SettlementCompareLauncher({
+  municipalities,
+  municipalitySlug,
+  settlementSlug,
+  settlementName,
+}: {
+  municipalities: ReturnType<typeof useAtlasMunicipalities>["municipalities"];
+  municipalitySlug: string;
+  settlementSlug: string;
+  settlementName: string;
+}) {
+  const navigate = useNavigate();
+  const options = useMemo(
+    () =>
+      settlementOptionsFromMunicipalities(municipalities).filter(
+        (option) => !(option.municipalitySlug === municipalitySlug && option.settlementSlug === settlementSlug),
+      ),
+    [municipalities, municipalitySlug, settlementSlug],
+  );
+  const defaultOption = useMemo(
+    () => options.find((option) => option.settlementSlug === "modrica") ?? options[0] ?? null,
+    [options],
+  );
+  const [selected, setSelected] = useState(defaultOption);
+
+  useEffect(() => {
+    setSelected(defaultOption);
+  }, [defaultOption]);
+
+  if (!selected) return null;
+
+  return (
+    <section className="editorial-panel mt-8 p-5 sm:p-6" aria-labelledby="poredi-naselja">
+      <h2 id="poredi-naselja" className="text-lg font-extrabold">Poređenje sa drugim naseljima</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Izaberite naselje za usporedbu s {settlementName}. Adresa ostaje opštinski kvalifikovana.
+      </p>
+      <div className="mt-4 max-w-md">
+        <AtlasSettlementSelect
+          id="settlement-compare-other"
+          label="Drugo naselje"
+          municipalities={municipalities}
+          value={selected}
+          onChange={setSelected}
+        />
+      </div>
+      <button
+        type="button"
+        className="action-link mt-4"
+        onClick={() => navigate(comparePath(municipalitySlug, settlementSlug, selected.municipalitySlug, selected.settlementSlug))}
+      >
+        Uporedi
+      </button>
+    </section>
   );
 }

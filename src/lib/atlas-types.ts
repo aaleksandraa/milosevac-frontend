@@ -1,3 +1,5 @@
+import type { AtlasRelativeFact } from "@/lib/atlas-ranking-types";
+
 export type GeoSource = {
   name: string;
   provider?: string;
@@ -205,6 +207,7 @@ export type GeoSettlementDetail = {
   points?: Array<{ type: string; lat: number; lng: number }>;
   geography?: GeoGeography;
   climate?: GeoClimate;
+  relative_facts?: AtlasRelativeFact[];
   neighbors?: {
     previous: GeoNeighbor | null;
     next: GeoNeighbor | null;
