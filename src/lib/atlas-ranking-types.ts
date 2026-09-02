@@ -7,7 +7,7 @@ export type AtlasMetricDefinition = {
   short_label: string;
   unit: string;
   source_family: string;
-  category: "population" | "geography" | "climate" | "places";
+  category: "population" | "geography" | "climate" | "places" | "land_cover";
   category_label: string;
   default_direction: RankingDirectionCode;
   allows_both_directions: boolean;
@@ -18,6 +18,7 @@ export type AtlasMetricDefinition = {
   high_semantic_label: string;
   low_semantic_label: string;
   percentage_difference_useful: boolean;
+  percentage_point_difference?: boolean;
   methodology: string;
   eligibility: string;
   high_ranking_label: string;
@@ -92,7 +93,7 @@ export type AtlasCompareRow = {
   unit: string;
   a: { value: number | null; unavailable_reason?: string | null };
   b: { value: number | null; unavailable_reason?: string | null };
-  difference?: { absolute: number; percentage: number | null } | null;
+  difference?: { absolute: number; percentage: number | null; percentage_points?: number | null } | null;
   comparable: boolean;
   caveat?: string | null;
   source_family: string;

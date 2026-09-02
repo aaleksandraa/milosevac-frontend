@@ -5,6 +5,7 @@ import { AtlasBreadcrumbs } from "@/components/atlas/AtlasBreadcrumbs";
 import { AtlasStatCard } from "@/components/atlas/AtlasStatCard";
 import { PopulationSection } from "@/components/atlas/PopulationSection";
 import { ClimateSection } from "@/components/atlas/ClimateSection";
+import { LandCoverSection } from "@/components/atlas/LandCoverSection";
 import { SourcePanel } from "@/components/atlas/SourcePanel";
 import { AtlasMap } from "@/components/atlas/map/AtlasMap";
 import { AtlasRelativeFacts } from "@/components/atlas/AtlasRelativeFacts";
@@ -118,6 +119,8 @@ const AtlasSettlement = () => {
         <GeographySection geography={settlement.geography} />
 
         <ClimateSection climate={settlement.climate} />
+
+        <LandCoverSection landCover={settlement.land_cover} />
 
         {settlement.relative_facts && settlement.relative_facts.length > 0 ? (
           <AtlasRelativeFacts facts={settlement.relative_facts} />

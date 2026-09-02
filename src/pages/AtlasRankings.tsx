@@ -73,7 +73,7 @@ const AtlasRankings = () => {
                 update({ metric: nextMetric, direction: nextDirection });
               }}
             >
-              {["Stanovništvo", "Geografija i teren", "Klima", "Objekti i sadržaji"].map((category) => (
+              {Array.from(new Set(presets.map((preset) => preset.category_label))).map((category) => (
                 <optgroup key={category} label={category}>
                   {presets.filter((preset) => preset.category_label === category).map((preset) => (
                     <option key={preset.id} value={preset.id}>{preset.label}</option>

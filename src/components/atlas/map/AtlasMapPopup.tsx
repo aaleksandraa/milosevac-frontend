@@ -35,6 +35,12 @@ export function AtlasMapPopup({
     properties.precipitation_annual_mm !== undefined
       ? ["Godišnje padavine", formatPrecipitationMm(properties.precipitation_annual_mm)]
       : null,
+    properties.landcover_agricultural_pct !== undefined
+      ? ["Poljoprivredne površine", `${properties.landcover_agricultural_pct.toLocaleString("bs-BA", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`]
+      : null,
+    properties.tree_cover_mean_pct !== undefined
+      ? ["Pokrivenost krošnjama", `${properties.tree_cover_mean_pct.toLocaleString("bs-BA", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`]
+      : null,
   ].filter((item): item is [string, string] => item !== null);
 
   return (

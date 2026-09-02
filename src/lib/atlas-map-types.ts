@@ -6,7 +6,11 @@ export type AtlasThematicMode =
   | "population_2013"
   | "population_change_1991_2013"
   | "temperature_mean_annual"
-  | "precipitation_annual";
+  | "precipitation_annual"
+  | "landcover_agricultural"
+  | "landcover_forest"
+  | "landcover_artificial"
+  | "tree_cover_mean";
 
 export type AtlasMapFeatureProperties = {
   settlement_id: number;
@@ -31,6 +35,11 @@ export type AtlasMapFeatureProperties = {
   precipitation_annual_mm?: number;
   climate_quality_flag?: string;
   climate_normal_period?: string;
+  landcover_agricultural_pct?: number;
+  landcover_forest_pct?: number;
+  landcover_artificial_pct?: number;
+  tree_cover_mean_pct?: number;
+  imperviousness_mean_pct?: number;
 };
 
 export type AtlasMapFeature = {
@@ -53,6 +62,8 @@ export type AtlasMapMeta = {
   terrain_note?: string;
   coverage_note?: string;
   climate_note?: string;
+  landcover_note?: string;
+  landcover_source_type?: string;
   population_change_note?: string;
 };
 
@@ -123,5 +134,37 @@ export const THEMATIC_MODES: Array<{
     unit: "mm",
     legendTitle: "Godišnje padavine",
     legendNote: "ERA5 reanaliza, period 1991–2020. Nisu mjerenja meteorološke stanice.",
+  },
+  {
+    id: "landcover_agricultural",
+    label: "Poljoprivredne površine",
+    property: "landcover_agricultural_pct",
+    unit: "%",
+    legendTitle: "Udio poljoprivrednih površina",
+    legendNote: "CORINE Land Cover 2018, unutar atlas granice naselja. Referentna 2018. godina.",
+  },
+  {
+    id: "landcover_forest",
+    label: "Šumske površine",
+    property: "landcover_forest_pct",
+    unit: "%",
+    legendTitle: "Udio šumskog pokrova (CLC)",
+    legendNote: "CLC razredi 311–313, 2018. Nije gustoća krošnji.",
+  },
+  {
+    id: "landcover_artificial",
+    label: "Umjetne površine",
+    property: "landcover_artificial_pct",
+    unit: "%",
+    legendTitle: "Udio umjetnih površina",
+    legendNote: "CORINE Land Cover 2018. Nisu sve umjetne površine zgrade.",
+  },
+  {
+    id: "tree_cover_mean",
+    label: "Pokrivenost krošnjama",
+    property: "tree_cover_mean_pct",
+    unit: "%",
+    legendTitle: "Prosječna pokrivenost krošnjama",
+    legendNote: "Copernicus HRL Tree Cover Density 2018. Gustoća krošnji, ne CLC udio šume.",
   },
 ];

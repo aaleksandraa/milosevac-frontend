@@ -16,7 +16,8 @@ Branch (backend): `feature/bih-settlement-atlas`
 | **M7** | **Complete** | ERA5-Land / ERA5 climate normals + historical analytics (pilot) |
 | **M8** | **Complete** | Historical settlement population 1971/1981/1991 + change analytics (pilot) |
 | **M9** | **Complete** | Comparison + rankings engine (pilot + municipality scopes) |
-| M10–M12 | Not started | Land cover, national import, … |
+| **M10** | **Complete** | Land cover / CLC + HRL surface analytics (37/45 pilot) |
+| M11–M12 | Not started | Rivers/access, national import, … |
 
 ## M3 result
 
@@ -67,4 +68,10 @@ Branch (backend): `feature/bih-settlement-atlas`
 - Settlement relative facts + map popup rank for existing thematic metrics
 - See [M9_COMPARISON_RANKINGS.md](M9_COMPARISON_RANKINGS.md)
 
-M10 was not started.
+## M10 result
+
+- CLC 2018 vector + HRL TCD/IMD/WAW/FTY 2018 offline profiles for **37/37** boundary settlements
+- Public settlement `land_cover`, map choropleths, M9 ranking/compare integration
+- See [M10_LAND_COVER.md](M10_LAND_COVER.md)
+
+M11 was not started.

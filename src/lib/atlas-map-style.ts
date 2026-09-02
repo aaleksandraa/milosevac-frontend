@@ -57,6 +57,10 @@ const SCALES: Record<Exclude<AtlasThematicMode, "boundaries">, string[]> = {
   population_change_1991_2013: ["#b2182b", "#ef8a62", "#f7f7f7", "#67a9cf", "#2166ac"],
   temperature_mean_annual: ["#ffffcc", "#ffeda0", "#feb24c", "#f03b20", "#bd0026"],
   precipitation_annual: ["#f7fbff", "#c6dbef", "#6baed6", "#2171b5", "#084594"],
+  landcover_agricultural: ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#238443"],
+  landcover_forest: ["#f7fcf5", "#c7e9c0", "#74c476", "#238b45", "#00441b"],
+  landcover_artificial: ["#fff7f3", "#fcc5c0", "#fa9fb5", "#c51b8a", "#7a0177"],
+  tree_cover_mean: ["#ffffcc", "#c2e699", "#78c679", "#31a354", "#006837"],
 };
 
 export type AtlasMapSourceSpec =

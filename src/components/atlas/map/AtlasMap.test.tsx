@@ -30,6 +30,10 @@ const mapState = vi.hoisted(() => ({
           slope_mean_deg: 2.45,
           temperature_mean_annual_c: 0,
           precipitation_annual_mm: 0,
+          landcover_agricultural_pct: 70,
+          landcover_forest_pct: 20,
+          landcover_artificial_pct: 4,
+          tree_cover_mean_pct: 18.4,
         },
         geometry: { type: "Polygon", coordinates: [] },
       },
@@ -204,6 +208,11 @@ describe("atlas map", () => {
     expect(screen.getByText(/ERA5-Land reanaliza, period 1991–2020/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "precipitation_annual" } });
     expect(screen.getAllByText("Godišnje padavine").length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "landcover_agricultural" } });
+    expect(screen.getAllByText("Udio poljoprivrednih površina").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/CORINE Land Cover 2018/).length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByLabelText("Prikaz"), { target: { value: "tree_cover_mean" } });
+    expect(screen.getAllByText("Prosječna pokrivenost krošnjama").length).toBeGreaterThan(0);
   });
 
   it("displays population 0 in the selected card", () => {

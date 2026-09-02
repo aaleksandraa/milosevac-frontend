@@ -51,7 +51,9 @@ function CompareRow({ row }: { row: AtlasCompareRow }) {
       <td className="py-3">
         {row.difference && row.comparable ? (
           <p>
-            {formatMetricValue(row.difference.absolute, row.unit, 1)}
+            {row.difference.percentage_points != null
+              ? `${formatMetricValue(row.difference.percentage_points, "pp")}`
+              : formatMetricValue(row.difference.absolute, row.unit, 1)}
             {row.difference.percentage !== null ? ` (${formatMetricValue(row.difference.percentage, "%")})` : ""}
           </p>
         ) : (

@@ -65,6 +65,14 @@ export function metricForThematicMode(mode: AtlasThematicMode): string | null {
       return "temperature_mean_annual_c";
     case "precipitation_annual":
       return "precipitation_annual_mm";
+    case "landcover_agricultural":
+      return "landcover_agricultural_pct";
+    case "landcover_forest":
+      return "landcover_forest_pct";
+    case "landcover_artificial":
+      return "landcover_artificial_pct";
+    case "tree_cover_mean":
+      return "tree_cover_mean_pct";
     default:
       return null;
   }
@@ -78,6 +86,7 @@ export function formatMetricValue(value: number | null | undefined, unit: string
   if (unit === "mm") return formatPrecipitationMm(value);
   if (unit === "°") return formatSlopeDeg(value);
   if (unit === "%") return `${formatBsDecimal(value, 1)}%`;
+  if (unit === "pp") return `${formatBsDecimal(value, 1)} pp`;
   if (unit === "dana/god.") return `${formatBsDecimal(value, precision)} dana/god.`;
   if (unit === "") return formatBsNumber(Math.round(value));
   return `${formatBsDecimal(value, precision)} ${unit}`.trim();

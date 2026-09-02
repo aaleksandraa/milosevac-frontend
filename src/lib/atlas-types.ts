@@ -190,6 +190,69 @@ export type GeoClimate = {
   source?: GeoSource | null;
 };
 
+export type GeoLandCoverGroup = {
+  code: string;
+  label: string;
+  share_pct: number | null;
+};
+
+export type GeoLandCoverClass = {
+  code: string;
+  label: string;
+  atlas_group?: string | null;
+  atlas_group_label?: string | null;
+  area_km2: number;
+  share_pct: number | null;
+};
+
+export type GeoLandCover = {
+  reference_year: number;
+  summary?: {
+    dominant_group?: { code: string; label: string; share_pct?: number; area_km2?: number } | null;
+    dominant_class?: { code: string; label: string; atlas_group?: string; share_pct?: number; area_km2?: number } | null;
+    artificial_pct?: number | null;
+    agricultural_pct?: number | null;
+    forest_pct?: number | null;
+    seminatural_pct?: number | null;
+    open_or_sparse_pct?: number | null;
+    wetland_pct?: number | null;
+    water_pct?: number | null;
+    groups?: GeoLandCoverGroup[];
+  };
+  classes?: GeoLandCoverClass[];
+  forest?: {
+    tree_cover_mean_pct?: number | null;
+    forest_area_pct?: number | null;
+    tree_cover_wording?: string | null;
+    forest_area_wording?: string | null;
+    reference_year?: number;
+  } | null;
+  imperviousness?: {
+    imperviousness_mean_pct?: number | null;
+    wording?: string | null;
+    reference_year?: number;
+  } | null;
+  water_wetness?: {
+    permanent_water_pct?: number | null;
+    temporary_water_pct?: number | null;
+    wet_area_pct?: number | null;
+    water_wetness_pct?: number | null;
+    wording?: string | null;
+    reference_year?: number;
+  } | null;
+  methodology?: {
+    text: string;
+    algorithm_version?: string;
+    processing_crs?: string;
+    clc_method?: string;
+    hrl_method?: string;
+    quality_flag?: string;
+    boundary_note?: string;
+    temporal_note?: string;
+  };
+  source?: GeoSource | null;
+};
+
 export type GeoSettlementDetail = {
   id: number;
   name: string;
@@ -207,6 +270,7 @@ export type GeoSettlementDetail = {
   points?: Array<{ type: string; lat: number; lng: number }>;
   geography?: GeoGeography;
   climate?: GeoClimate;
+  land_cover?: GeoLandCover;
   relative_facts?: AtlasRelativeFact[];
   neighbors?: {
     previous: GeoNeighbor | null;

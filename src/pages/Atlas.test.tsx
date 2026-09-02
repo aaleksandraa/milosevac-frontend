@@ -179,6 +179,29 @@ const rankingMetrics: AtlasMetricDefinition[] = [
     high_ranking_label: "Najviša prosječna nadmorska visina",
     low_ranking_label: "Najniža prosječna nadmorska visina",
   },
+  {
+    code: "landcover_agricultural_pct",
+    label: "Udio poljoprivrednih površina",
+    short_label: "Poljoprivreda (CLC)",
+    unit: "%",
+    source_family: "landcover",
+    category: "land_cover",
+    category_label: "Pokrov zemljišta",
+    default_direction: "desc",
+    allows_both_directions: true,
+    rankable: true,
+    zero_is_valid: true,
+    precision: 1,
+    ranking_method: "competition",
+    high_semantic_label: "najveći udio poljoprivrednih površina",
+    low_semantic_label: "najmanji udio poljoprivrednih površina",
+    percentage_difference_useful: false,
+    percentage_point_difference: true,
+    methodology: "CLC 2018 unutar atlas granice.",
+    eligibility: "M10 CLC profil.",
+    high_ranking_label: "Najveći udio poljoprivrednih površina",
+    low_ranking_label: "Najmanji udio poljoprivrednih površina",
+  },
 ];
 
 const rankingTable: AtlasRankingTable = {
@@ -275,6 +298,24 @@ const comparison: AtlasComparePayload = {
         },
       ],
     },
+    {
+      code: "land_cover",
+      label: "Pokrov zemljišta",
+      rows: [
+        {
+          metric: "landcover_agricultural_pct",
+          label: "Udio poljoprivrednih površina",
+          short_label: "Poljoprivreda (CLC)",
+          unit: "%",
+          a: { value: 60 },
+          b: { value: 40 },
+          difference: { absolute: 20, percentage: null, percentage_points: 20 },
+          comparable: true,
+          source_family: "landcover",
+          methodology: "CLC 2018.",
+        },
+      ],
+    },
   ],
 };
 
@@ -365,6 +406,51 @@ const milosevacWithClimate: GeoSettlementDetail = {
       source_class: "B",
       source_class_label: "Javni naučni ili institucionalni skup",
       methodology_note: "Klimatološki podaci su ERA5-Land reanaliza za područje naselja.",
+    },
+  },
+};
+
+const milosevacWithLandCover: GeoSettlementDetail = {
+  ...milosevacWithClimate,
+  land_cover: {
+    reference_year: 2018,
+    summary: {
+      agricultural_pct: 70,
+      forest_pct: 20,
+      artificial_pct: 4,
+      water_pct: 0,
+      seminatural_pct: 0.05,
+      dominant_group: { code: "agricultural", label: "Poljoprivredne površine", share_pct: 70 },
+      groups: [
+        { code: "agricultural", label: "Poljoprivredne površine", share_pct: 70 },
+        { code: "forest", label: "Šumske površine", share_pct: 20 },
+        { code: "artificial_surfaces", label: "Umjetne površine", share_pct: 4 },
+        { code: "shrub_herbaceous_or_seminatural", label: "Žbunasta, zeljasta ili poluprirodna vegetacija", share_pct: 0.05 },
+        { code: "water", label: "Vode", share_pct: 0 },
+      ],
+    },
+    classes: [
+      { code: "211", label: "Neirigirane oranice", atlas_group: "agricultural", atlas_group_label: "Poljoprivredne površine", area_km2: 7, share_pct: 70 },
+      { code: "311", label: "Širokolisna šuma", atlas_group: "forest", atlas_group_label: "Šumske površine", area_km2: 2, share_pct: 20 },
+    ],
+    forest: {
+      tree_cover_mean_pct: 18.4,
+      tree_cover_wording: "Pokrivenost krošnjama / gustoća drvenastog pokrova prema Copernicus HRL Tree Cover Density 2018.",
+    },
+    imperviousness: {
+      imperviousness_mean_pct: 2.1,
+      wording: "Prosječna gustoća nepropusnosti prema Copernicus HRL Imperviousness Density 2018.",
+    },
+    methodology: {
+      text: "Pokrov zemljišta izračunat je unutar trenutno dostupne atlas granice naselja.",
+      temporal_note: "prema podacima za referentnu 2018. godinu",
+    },
+    source: {
+      name: "Copernicus CORINE Land Cover 2018",
+      provider: "European Environment Agency / Copernicus Land Monitoring Service",
+      source_class: "B",
+      source_class_label: "Javni naučni ili institucionalni skup",
+      dataset_version: "v2020_20u1",
     },
   },
 };
@@ -761,6 +847,47 @@ describe("atlas pages", () => {
     expect(screen.queryByRole("heading", { name: "Klima" })).not.toBeInTheDocument();
   });
 
+  it("renders land-cover section with chart, table, year and tiny-share formatting", () => {
+    hookState.settlement = milosevacWithLandCover;
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Pokrov i korištenje zemljišta" })).toBeInTheDocument();
+    expect(screen.getAllByText(/referentnu 2018/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/trenutno dostupne atlas granice/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("70,0%").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("0,0%").length).toBeGreaterThan(0);
+    expect(screen.getByText("<0,1%")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Sastav pokrova zemljišta/ })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: /Glavne grupe pokrova zemljišta/ })).toBeInTheDocument();
+    expect(screen.getByText(/Pokrivenost krošnjama \/ gustoća drvenastog pokrova/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Prikaži detaljne CLC razrede/ }));
+    expect(screen.getByText("Neirigirane oranice")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Klima" })).toBeInTheDocument();
+    expect(screen.queryByText(/danas je/i)).not.toBeInTheDocument();
+  });
+
+  it("hides land-cover when the API omits the block", () => {
+    hookState.settlement = milosevacWithClimate;
+
+    render(
+      <MemoryRouter initialEntries={["/mjesta/modrica/milosevac"]}>
+        <Routes>
+          <Route path="/mjesta/:municipalitySlug/:settlementSlug" element={<AtlasSettlement />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Klima" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Pokrov i korištenje zemljišta" })).not.toBeInTheDocument();
+  });
+
   it("renders Njegoševo population 0 as sourced data", () => {
     hookState.settlement = njegosevo;
 
@@ -865,6 +992,8 @@ describe("atlas pages", () => {
     expect(screen.getByText("Nema dostupnog podatka")).toBeInTheDocument();
     expect(screen.queryByText(/^0$/)).not.toBeInTheDocument();
     expect(screen.getByText(/granice kroz vrijeme nisu nužno potpuno iste/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pokrov zemljišta" })).toBeInTheDocument();
+    expect(screen.getByText("20,0 pp")).toBeInTheDocument();
     expect(comparePath("modrica", "milosevac", "samac", "samac")).toBe("/uporedi/modrica/milosevac/samac/samac");
   });
 
@@ -883,6 +1012,7 @@ describe("atlas pages", () => {
     expect(screen.getAllByText(/2\. od 45/).length).toBe(2);
     expect(screen.getAllByText(/izjednačeno/).length).toBe(2);
     expect(screen.getByLabelText("Pokazatelj")).toBeInTheDocument();
+    expect(screen.getByText("Najveći udio poljoprivrednih površina")).toBeInTheDocument();
     expect(screen.getByLabelText("Obuhvat")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Obuhvat"), { target: { value: "municipality" } });
     expect(screen.getByLabelText("Opština")).toBeInTheDocument();
