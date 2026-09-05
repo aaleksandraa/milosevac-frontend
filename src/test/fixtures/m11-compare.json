@@ -1,0 +1,172 @@
+{
+  "a": {
+    "id": 17,
+    "name": "Miloševac",
+    "slug": "milosevac",
+    "path": "/mjesta/modrica/milosevac",
+    "municipality": {
+      "id": 1,
+      "name": "Modriča",
+      "slug": "modrica",
+      "path": "/mjesta/modrica"
+    }
+  },
+  "b": {
+    "id": 18,
+    "name": "Modriča",
+    "slug": "modrica",
+    "path": "/mjesta/modrica/modrica",
+    "municipality": {
+      "id": 1,
+      "name": "Modriča",
+      "slug": "modrica",
+      "path": "/mjesta/modrica"
+    }
+  },
+  "sections": [
+    {
+      "code": "network",
+      "label": "Povezanost i vode",
+      "rows": [
+        {
+          "metric": "mapped_road_length_km",
+          "label": "Mapirani putevi",
+          "short_label": "Mapirani putevi",
+          "unit": "km",
+          "a": {
+            "value": 48.04,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 117.89,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": -69.84,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        },
+        {
+          "metric": "mapped_road_density_km_per_km2",
+          "label": "Gustina mapirane putne mreže",
+          "short_label": "Gustina mapirane putne mreže",
+          "unit": "km/km²",
+          "a": {
+            "value": 2.76,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 9.05,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": -6.28,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        },
+        {
+          "metric": "major_road_length_km",
+          "label": "Mapirani glavni putevi",
+          "short_label": "Mapirani glavni putevi",
+          "unit": "km",
+          "a": {
+            "value": 5.92,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 10.48,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": -4.55,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        },
+        {
+          "metric": "waterway_length_km",
+          "label": "Mapirani vodotoci",
+          "short_label": "Mapirani vodotoci",
+          "unit": "km",
+          "a": {
+            "value": 0.46,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 9.05,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": -8.59,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        },
+        {
+          "metric": "distance_to_municipality_centre_km",
+          "label": "Pravolinijski do opštinskog centra",
+          "short_label": "Pravolinijski do opštinskog centra",
+          "unit": "km",
+          "a": {
+            "value": 8.6,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 0,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": 8.6,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        },
+        {
+          "metric": "distance_to_nearest_major_road_km",
+          "label": "Pravolinijski do glavnog puta",
+          "short_label": "Pravolinijski do glavnog puta",
+          "unit": "km",
+          "a": {
+            "value": 1.46,
+            "unavailable_reason": null
+          },
+          "b": {
+            "value": 0.44,
+            "unavailable_reason": null
+          },
+          "difference": {
+            "absolute": 1.02,
+            "percentage": null,
+            "percentage_points": null
+          },
+          "comparable": true,
+          "caveat": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka.",
+          "source_family": "network",
+          "methodology": "Prema trenutno dostupnim OSM podacima; nije službeni inventar. Potpunost mapiranja varira. Udaljenosti su pravolinijske od referentne tačke naselja, nisu putne udaljenosti ni vrijeme vožnje. Najbliži objekat znači najbliži u uvezenom skupu podataka."
+        }
+      ]
+    }
+  ]
+}

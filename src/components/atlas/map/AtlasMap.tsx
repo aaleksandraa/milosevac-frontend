@@ -1,3 +1,4 @@
+import { NetworkLayers } from "./NetworkLayers";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { MapLayerMouseEvent } from "maplibre-gl";
@@ -181,6 +182,7 @@ export function AtlasMap({
         </p>
       </div>
 
+      <NetworkLayers mapRef={mapRef} ready={ready} municipalitySlug={municipalitySlug} />
       {missingBoundaryName ? (
         <p className="mb-3 rounded-md border border-border/70 bg-muted/60 px-3 py-2 text-sm" role="status">
           Granica trenutno nije dostupna na karti za {missingBoundaryName}. Naselje ostaje u atlasu preko liste i stranice naselja.

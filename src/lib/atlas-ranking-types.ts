@@ -7,7 +7,7 @@ export type AtlasMetricDefinition = {
   short_label: string;
   unit: string;
   source_family: string;
-  category: "population" | "geography" | "climate" | "places" | "land_cover";
+  category: "population" | "geography" | "climate" | "places" | "land_cover" | "network";
   category_label: string;
   default_direction: RankingDirectionCode;
   allows_both_directions: boolean;

@@ -1,3 +1,4 @@
+import type { TransportProfile, HydroProfile, ProximityResult } from "./atlas-network";
 import type { AtlasRelativeFact } from "@/lib/atlas-ranking-types";
 
 export type GeoSource = {
@@ -271,6 +272,9 @@ export type GeoSettlementDetail = {
   geography?: GeoGeography;
   climate?: GeoClimate;
   land_cover?: GeoLandCover;
+  transport?: TransportProfile;
+  hydrography?: HydroProfile;
+  proximity?: Record<string, ProximityResult>;
   relative_facts?: AtlasRelativeFact[];
   neighbors?: {
     previous: GeoNeighbor | null;

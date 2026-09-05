@@ -1,3 +1,4 @@
+import { NetworkSection } from "@/components/atlas/NetworkSection";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -121,6 +122,7 @@ const AtlasSettlement = () => {
         <ClimateSection climate={settlement.climate} />
 
         <LandCoverSection landCover={settlement.land_cover} />
+        <NetworkSection transport={settlement.transport} hydrography={settlement.hydrography} proximity={settlement.proximity} />
 
         {settlement.relative_facts && settlement.relative_facts.length > 0 ? (
           <AtlasRelativeFacts facts={settlement.relative_facts} />

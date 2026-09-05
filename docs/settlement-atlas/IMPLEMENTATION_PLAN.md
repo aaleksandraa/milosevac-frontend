@@ -74,4 +74,11 @@ Branch (backend): `feature/bih-settlement-atlas`
 - Public settlement `land_cover`, map choropleths, M9 ranking/compare integration
 - See [M10_LAND_COVER.md](M10_LAND_COVER.md)
 
-M11 was not started.
+## M11 implementation (acceptance open)
+
+- Actual regional OSM acquisition, offline GIS processing and idempotent pilot DB import.
+- 37 road/hydro profiles; 37 settlements with proximity; M9 ranking/compare integration.
+- Optional municipality-scoped network GeoJSON; settlement transport/hydro/proximity sections.
+- Automated validation and API measurements completed; desktop/mobile browser QA and render measurements remain blocked by no connected browser.
+- See [M11_NETWORK_ACCESSIBILITY.md](M11_NETWORK_ACCESSIBILITY.md).
+- M12 has NOT started.
