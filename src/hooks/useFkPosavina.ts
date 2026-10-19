@@ -26,13 +26,13 @@ export function useFkPosavina() {
     retry: 1,
   });
 
-  const live = query.data?.galleryMatches?.length ? query.data.galleryMatches : query.data?.matches;
-  const matches = live?.length ? live : fkPosavinaGalleryMatches;
+  const apiMatches = query.data?.matches ?? [];
+  const matches = apiMatches.length > 0 ? apiMatches : fkPosavinaGalleryMatches;
 
   return {
     matches,
     latestMatch: matches[0] ?? fkPosavinaGalleryMatches[0],
-    isLive: Boolean(live?.length),
+    isLive: apiMatches.length > 0,
     loading: query.isPending,
   };
 }
