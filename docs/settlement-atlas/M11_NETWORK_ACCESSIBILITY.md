@@ -1,6 +1,6 @@
 # M11 — Transport, hydrography and proximity presentation
 
-The implementation and actual pilot import are ready for review. **M11 acceptance is still open because no browser was available for manual desktop/mobile QA or render-time measurements.** No M12 work, merge or push.
+The implementation and actual pilot import are ready for review. **M11 acceptance is still open: text/layout browser QA passed on 2026-10-19, but visual map-layer inspection and render timing still need a regular browser (see Validation).** No M12 work, merge or push.
 
 ## Presentation
 
@@ -50,7 +50,9 @@ Backend's companion `docs/settlement-atlas/M11_NETWORK_ACCESSIBILITY.md` and `m1
 - `npm run build`: passes; pre-existing large MapLibre chunk and Browserslist notices.
 - Additional TypeScript check reports existing issues in `useOutages.test.ts`, `atlas-map-engine.ts`, `atlas-ranking.ts`; no remaining new network-file error.
 - Existing climate, land-cover, POI, population and terrain tests pass.
-- **Not done:** browser screenshots, desktop/mobile visual inspection, basemap geometry alignment and render timing. Runtime browser discovery returned no connected browser. Do not claim visual QA or mark M11 fully complete until this gate is finished.
+- **Browser QA 2026-10-19 (local dev servers, Cursor embedded browser):** settlement pages Miloševac, Modriča, Šamac render "Putevi i povezanost" and "Rijeke i vode"; every distance carries "pravolinijski" plus the not-road-distance/not-driving-time disclaimer; unnamed targets use the generic label; Modriča/Šamac show 0 m to their own centre; duplicate same-name OSM ways (Sava ×2 in Šamac) are listed once; no-boundary settlements (Botajica, Njegoševo) omit all three blocks. Compare `/uporedi/modrica/milosevac/modrica/modrica` shows "Povezanost i vode" with km and km/km² differences, no percentages. `/rang-liste` lists the six M11 metrics with neutral labels and 37/45 eligibility. At 390 px mobile width both sections are 358 px wide with no horizontal overflow.
+- **Still not done:** visual map inspection (road/hydro alignment with the basemap) and render timing. The embedded browser tab does not run MapLibre web workers: even a minimal one-point GeoJSON map never fires `load`, so no atlas layer renders there. This is an environment limit, not an M11 regression. Check `/mjesta/samac/samac` and `/mjesta/modrica/milosevac` with both network layers enabled in a regular desktop and mobile browser before marking M11 accepted.
+- **Open data-quality notes:** the only `railway_station` in M6 is Slavonski Šamac (Croatia), and some nearest pharmacies are cross-border (e.g. Šamac town → "Ljekarna Vukić" 9.5 km) because OSM lacks local objects. The compare table repeats the same OSM disclaimer under every M11 row.
 
 Starting frontend HEAD: `8a1c18ad6e7ad12448b79083a2950d1eebba2bcd`, branch `feature/bih-settlement-atlas`. Backend starting HEAD: `99ae77a82f090f7dbcecc580107acde1e3d43feb` on the same branch name. Implementation commits remain local.
 
