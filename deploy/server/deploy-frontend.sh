@@ -27,4 +27,15 @@ grep -q 'social-preview.php' "$FRONTEND_DIR/dist/.htaccess" || {
   exit 1;
 }
 
+rm -f \
+  "$APP_ROOT/logo.webp" \
+  "$APP_ROOT/logo.png" \
+  "$APP_ROOT/logo.jpg" \
+  "$APP_ROOT/logo.jpeg" \
+  "$FRONTEND_DIR/logo.webp" \
+  "$FRONTEND_DIR/dist/logo.webp" \
+  "$FRONTEND_DIR/dist/logo.png" \
+  "$FRONTEND_DIR/dist/logo.jpg" \
+  "$FRONTEND_DIR/dist/logo.jpeg"
+
 echo "Frontend deployment completed: $(git -C "$FRONTEND_DIR" rev-parse --short HEAD)"

@@ -2,6 +2,9 @@
     RewriteEngine On
     RewriteBase /
 
+    # Stari logo.webp je tuđi znak. Identitet portala je samo tekst Miloševac.
+    RewriteRule ^logo\.(webp|png|jpe?g)$ - [G,L]
+
     RewriteRule ^robots\.txt$ - [L]
     RewriteRule ^ads\.txt$ - [L]
     RewriteRule ^sitemap\.xml$ - [L]
