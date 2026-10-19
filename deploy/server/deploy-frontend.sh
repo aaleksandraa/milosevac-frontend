@@ -22,8 +22,8 @@ git -C "$FRONTEND_DIR" checkout --force --detach FETCH_HEAD
 )
 
 test -f "$FRONTEND_DIR/dist/.htaccess" || { echo "Missing dist/.htaccess after build"; exit 1; }
-grep -q 'api.milosevac.com%{REQUEST_URI}' "$FRONTEND_DIR/dist/.htaccess" || {
-  echo "dist/.htaccess is missing the social crawler redirect rule";
+grep -q 'social-preview.php' "$FRONTEND_DIR/dist/.htaccess" || {
+  echo "dist/.htaccess is missing the social preview rule";
   exit 1;
 }
 

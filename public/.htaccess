@@ -14,10 +14,10 @@
     RewriteRule ^sitemap-matches\.xml$ https://api.milosevac.com/sitemap-matches.xml [R=302,L]
     RewriteRule ^sitemap-taxonomies\.xml$ https://api.milosevac.com/sitemap-taxonomies.xml [R=302,L]
 
-    # Facebook/Viber/WhatsApp crawlers must hit Laravel OG tags, not the SPA shell.
+    # Crawlers stay on milosevac.com. An external redirect made Facebook show api.milosevac.com.
     RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|Slackbot|TelegramBot|Viber|Discordbot|Pinterestbot|Googlebot|bingbot|Applebot|Embedly|SkypeUriPreview|redditbot) [NC]
     RewriteCond %{REQUEST_URI} ^/(clanak|fk-posavina|prekidi-struje|vrijeme|kontakt|omilosevcu|kategorija)(/|$) [NC]
-    RewriteRule ^ https://api.milosevac.com%{REQUEST_URI} [R=302,L,QSA]
+    RewriteRule ^ social-preview.php [L]
 
     # React SPA fallback.
     RewriteCond %{REQUEST_FILENAME} !-f

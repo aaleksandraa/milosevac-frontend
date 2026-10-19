@@ -27,18 +27,18 @@ ili, ako je cijeli repo u httpdocs:
 /var/www/vhosts/milosevac.com/httpdocs/frontend/dist
 ```
 
-`.htaccess` u dist folderu (SPA fallback + social crawler redirect — već u `public/.htaccess`, kopira se pri buildu):
+`.htaccess` u dist folderu (SPA fallback + social preview na istom domenu — već u `public/.htaccess`, kopira se pri buildu):
 
 ```apache
 RewriteEngine On
 RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|Facebot|Viber|WhatsApp|...) [NC]
-RewriteRule ^(clanak|fk-posavina|prekidi-struje|vrijeme|kontakt|omilosevcu|kategorija)/ https://api.milosevac.com/$1 [R=302,L,QSA]
+RewriteRule ^/(clanak|fk-posavina|...)/ social-preview.php [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
 ```
 
-Facebook/Viber/WhatsApp ne izvršavaju React — preusmjeravaju se na Laravel koji vraća OG tagove (naslov, opis, slika članka).
+Facebook/Viber/WhatsApp ne izvršavaju React. `social-preview.php` ostaje na `milosevac.com` i od API-ja uzme naslov, opis i sliku. Vanjsko preusmjeravanje na `api.milosevac.com` ne smije postojati, jer Facebook na kartici ispiše taj domen.
 
 Build na serveru:
 
