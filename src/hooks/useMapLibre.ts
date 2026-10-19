@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { atlasMapStyleUrl, BLANK_MAP_STYLE } from "@/lib/atlas-map-style";
 
 type MapLibreModule = typeof import("maplibre-gl");
@@ -27,6 +28,8 @@ export function useMapLibre(enabled: boolean) {
         await import("maplibre-gl/dist/maplibre-gl.css");
         if (cancelled || !containerRef.current) return;
 
+        // MapLibre resolves its worker next to its own module, which does not exist once Vite relocates the bundle.
+        maplibre.setWorkerUrl(maplibreWorkerUrl);
         map = new maplibre.Map({
           container: containerRef.current,
           style: atlasMapStyleUrl(),
