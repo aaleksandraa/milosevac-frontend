@@ -5,11 +5,14 @@ import type { AtlasComparePayload, AtlasCompareRow } from "@/lib/atlas-ranking-t
 export function AtlasCompareTable({ comparison }: { comparison: AtlasComparePayload }) {
   return (
     <div className="space-y-8">
-      {comparison.sections.map((section) => (
+      {comparison.sections.map((section) => {
+        const sharedCaveat = sectionCaveat(section.rows);
+        return (
         <section key={section.code} aria-labelledby={`compare-${section.code}`}>
           <h2 id={`compare-${section.code}`} className="text-lg font-extrabold">
             {section.label}
           </h2>
+          {sharedCaveat ? <p className="mt-1 text-sm text-muted-foreground">{sharedCaveat}</p> : null}
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[36rem] border-collapse text-sm">
               <caption className="sr-only">{section.label}</caption>
@@ -23,24 +26,30 @@ export function AtlasCompareTable({ comparison }: { comparison: AtlasComparePayl
               </thead>
               <tbody>
                 {section.rows.map((row) => (
-                  <CompareRow key={row.metric} row={row} />
+                  <CompareRow key={row.metric} row={row} showCaveat={!sharedCaveat} />
                 ))}
               </tbody>
             </table>
           </div>
         </section>
-      ))}
+        );
+      })}
     </div>
   );
 }
 
-function CompareRow({ row }: { row: AtlasCompareRow }) {
+function sectionCaveat(rows: AtlasCompareRow[]): string | null {
+  const first = rows[0]?.caveat;
+  return rows.length > 1 && first && rows.every((row) => row.caveat === first) ? first : null;
+}
+
+function CompareRow({ row, showCaveat }: { row: AtlasCompareRow; showCaveat: boolean }) {
   const bars = compareBarWidths(row);
   return (
     <tr className="border-b border-border/50 align-top">
       <th scope="row" className="py-3 pr-3 font-bold">
         {row.label}
-        {row.caveat ? <p className="mt-1 font-normal text-muted-foreground">{row.caveat}</p> : null}
+        {showCaveat && row.caveat ? <p className="mt-1 font-normal text-muted-foreground">{row.caveat}</p> : null}
       </th>
       <td className="py-3 pr-3">
         <CompareValue value={row.a.value} unit={row.unit} reason={row.a.unavailable_reason} width={bars?.a} />

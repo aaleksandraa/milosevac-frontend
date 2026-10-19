@@ -21,7 +21,7 @@ export function NetworkSection({ transport, hydrography, proximity }: { transpor
         <h3 className="mt-5 font-bold">Pravolinijske udaljenosti</h3>
         <p className="mt-1 text-sm text-muted-foreground">Od referentne tačke naselja{targets.some(([, t]) => t.origin_type === "geographic_centroid") ? " (geografski centroid; nije nužno središte naseljenog dijela)" : ""}. Najbliži objekti u uvezenom skupu; ovo nisu putne udaljenosti ni vrijeme vožnje.</p>
         <dl className="mt-3 space-y-3">{targets.map(([code, t]) => <div key={code} className="flex flex-wrap justify-between gap-x-4 gap-y-1 border-b border-border/40 pb-2">
-          <dt>{t.label}{t.target_name ? <span className="block text-sm text-muted-foreground">{t.target_name}</span> : null}</dt>
+          <dt>{t.label}{t.target_name ? <span className="block text-sm text-muted-foreground">{t.target_name}</span> : null}{t.target_in_country === false ? <span className="block text-sm text-amber-800 dark:text-amber-300">Cilj se nalazi izvan Bosne i Hercegovine (prema OSM državnoj granici).</span> : null}</dt>
           <dd className="font-bold">{formatDistance(t.distance_straight_m)} <span className="text-sm font-normal">pravolinijski</span></dd>
         </div>)}</dl>
       </> : null}

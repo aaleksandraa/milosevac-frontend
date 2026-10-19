@@ -1,12 +1,14 @@
 docs/settlement-atlas/IMPLEMENTATION_PLAN.md
 docs/settlement-atlas/M11_CHANGED_FILES.txt
 docs/settlement-atlas/M11_NETWORK_ACCESSIBILITY.md
+src/components/atlas/AtlasCompareTable.tsx
 src/components/atlas/NetworkComparison.test.tsx
 src/components/atlas/NetworkSection.test.tsx
 src/components/atlas/NetworkSection.tsx
 src/components/atlas/map/AtlasMap.tsx
 src/components/atlas/map/NetworkLayers.test.tsx
 src/components/atlas/map/NetworkLayers.tsx
+src/hooks/useMapLibre.ts
 src/lib/atlas-network.ts
 src/lib/atlas-ranking-types.ts
 src/lib/atlas-types.ts

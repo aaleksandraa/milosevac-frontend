@@ -23,6 +23,11 @@ describe("M11 settlement presentation", () => {
     expect(screen.getByText(/geografski centroid/)).toBeInTheDocument();
     expect(screen.getByText(/0 m/)).toBeInTheDocument();
   });
+  it("keeps cross-border distances and notes the target is outside BiH", () => {
+    render(<NetworkSection proximity={{ nearest_railway_station: { ...target, label: "Najbliža željeznička stanica", target_name: "Slavonski Šamac", target_in_country: false, distance_straight_m: 10998 }, nearest_pharmacy: { ...target, target_in_country: true } }} />);
+    expect(screen.getByText("11 km")).toBeInTheDocument();
+    expect(screen.getAllByText(/izvan Bosne i Hercegovine/)).toHaveLength(1);
+  });
   it("distinguishes boundary contact and hydrography from land cover", () => {
     render(<NetworkSection hydrography={{ waterway_length_km: 1, mapped_water_area_km2: 0, named_features: [{ name: "Bosna", osm_type: "way", osm_id: 1, feature_type: "river", relation: "touches_boundary" }], source, methodology: "OSM" }} />);
     expect(screen.getByText("Rijeke i vode")).toBeInTheDocument();

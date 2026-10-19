@@ -23,6 +23,7 @@ export interface HydroProfile {
 export interface ProximityResult {
   label: string;
   target_name: string | null;
+  target_in_country?: boolean | null;
   distance_straight_m: number;
   distance_route_m: null;
   travel_time_s: null;
